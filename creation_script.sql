@@ -3,7 +3,7 @@ DROP TABLE OWNER CASCADE CONSTRAINTS;
 DROP TABLE DRIVER CASCADE CONSTRAINTS;
 DROP TABLE LICENSE CASCADE CONSTRAINTS;
 DROP TABLE DRIVES_VEHICLE CASCADE CONSTRAINTS;
-DROP TABLE RADARS CASCADE CONSTRAINTS;
+DROP TABLE RADAR CASCADE CONSTRAINTS;
 DROP TABLE ROAD CASCADE CONSTRAINTS;
 DROP TABLE OBSERVATION CASCADE CONSTRAINTS;
 DROP TABLE TICKET CASCADE CONSTRAINTS;
@@ -24,7 +24,7 @@ CREATE TABLE OWNER(
 CREATE TABLE DRIVER(
   DriverName VARCHAR2(35) NOT NULL,
   DriverSurname_1 VARCHAR2(15) NOT NULL,
-  DriverSurname_2 VARCHAR2(15) NOT NULL,
+  DriverSurname_2 VARCHAR2(15),
   DriverAddress VARCHAR2(42) NOT NULL,
   DriverDni VARCHAR2(9) NOT NULL,
   DriverMobile NUMBER(9),
@@ -74,12 +74,12 @@ CREATE TABLE ROAD(
   CONSTRAINT ROAD_PK PRIMARY KEY (rname)
 );
 
-CREATE TABLE RADARS(
+CREATE TABLE RADAR(
   rname VARCHAR2(5) NOT NULL, /*1:n relation between Road:Radars*/
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
-  CONSTRAINT RADARS_PK PRIMARY KEY (mileagepoint,rname,direction),
-  CONSTRAINT RADARS_FK_ROAD FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE
+  CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction),
+  CONSTRAINT RADAR_FK_ROAD FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE
 );
 
 CREATE TABLE OBSERVATION(
@@ -88,7 +88,7 @@ CREATE TABLE OBSERVATION(
   speed NUMBER(5,2) NOT NULL,
   /*
 	1:n relation between Radars:Observation
-  */ 
+  */
   rname VARCHAR2(5) NOT NULL,
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
@@ -100,10 +100,13 @@ CREATE TABLE OBSERVATION(
   VIN VARCHAR2(17) NOT NULL,
   CONSTRAINT OBSERVATION_PK PRIMARY KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate),
   CONSTRAINT OBSERVATION_FK_VEHICLE FOREIGN KEY (nPlate,VIN,registration) REFERENCES VEHICLE ON DELETE CASCADE,
-  CONSTRAINT OBSERVATION_FK_RADARS FOREIGN KEY (mileagepoint,rname,direction) REFERENCES RADARS ON DELETE CASCADE
+  CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction) REFERENCES RADAR ON DELETE CASCADE
 );
 
 CREATE TABLE TICKET(
+  /*
+    In general: 1:n relation between Observation:Ticket
+  */
   odate DATE NOT NULL,
   otime NUMBER(3) NOT NULL, /*Hay que ponerlo en formato TIME*/
   /*
@@ -113,12 +116,12 @@ CREATE TABLE TICKET(
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
   /*
-	1:n relation between Vehicle:Ticket (PREGUNTAR A TONI E ISMA)
+	1:n relation between Vehicle:Ticket
   */
   registration DATE NOT NULL,
   nPlate VARCHAR2(7) NOT NULL,
   VIN VARCHAR2(17) NOT NULL,
-  OwnerDni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Ticket ???????????????????*/
+  OwnerDni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Ticket*/
   amount NUMBER(5,2) NOT NULL,
   emission_date DATE NOT NULL,
   due_date DATE NOT NULL,
@@ -134,10 +137,10 @@ CREATE TABLE TICKET(
 CREATE TABLE ALLEGATION(
   registration_date DATE NOT NULL,
   status VARCHAR2(15),
-  execution_date DATE,
+  execution_date DATE NOT NULL,
   /*
 	1:n relation between Observation:Allegation
-  */  
+  */
   odate DATE NOT NULL,
   otime NUMBER(3) NOT NULL, /*Hay que ponerlo en formato TIME*/
   rname VARCHAR2(5) NOT NULL,
