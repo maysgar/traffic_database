@@ -136,8 +136,8 @@ CREATE TABLE TICKET(
 
 CREATE TABLE ALLEGATION(
   registration_date DATE NOT NULL,
-  status VARCHAR2(15),
-  execution_date DATE NOT NULL,
+  status VARCHAR2(15) NOT NULL,
+  execution_date DATE,
   /*
 	1:n relation between Observation:Allegation
   */
