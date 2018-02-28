@@ -75,26 +75,25 @@ CREATE TABLE ROAD(
   CONSTRAINT ROAD_PK PRIMARY KEY (rname)
 );
 
+CREATE TABLE SECTION(
+  sectionID NUMBER(5) NOT NULL,
+  durationKm NUMBER(1) NOT NULL,
+  speedlimitSection NUMBER(5,2) NOT NULL,
+  /*
+    1:n relation between Road and Section
+  */
+  rname VARCHAR2(15) NOT NULL,
+  CONSTRAINT SECTION_PK PRIMARY KEY (rname,sectionID),
+  CONSTRAINT SEECTION_FK_RADAR FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE,
+  CONSTRAINT SECTION_DURATION CHECK (durationKm <= 5)
+);
+
 CREATE TABLE RADAR(
   rname VARCHAR2(5) NOT NULL, /*1:n relation between Road:Radars*/
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
   CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction),
   CONSTRAINT RADAR_FK_ROAD FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE
-);
-
-CREATE TABLE SECTION(
-  sectionID NUMBER(5) NOT NULL,
-  durationKm NUMBER(1) NOT NULL,
-  speedlimitSection NUMBER(5,2) NOT NULL,
-  /*
-    1:n relation between Radar and Section (implicit relation 1:n with road:section)
-  */
-  rname VARCHAR2(15) NOT NULL,
-  mileagepoint NUMBER(5,2) NOT NULL,
-  direction VARCHAR2(5) NOT NULL,
-  CONSTRAINT SECTION_PK PRIMARY KEY (rname, mileagepoint, direction, sectionID),
-  CONSTRAINT SECTION_DURATION CHECK (durationKm <= 5)
 );
 
 CREATE TABLE OBSERVATION(
