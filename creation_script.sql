@@ -48,7 +48,7 @@ CREATE TABLE VEHICLE(
   power VARCHAR2(6) NOT NULL,
   OwnerDni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Vehicle*/
   CONSTRAINT VEHICLE_PK PRIMARY KEY (nPlate,VIN,registration),
-  CONSTRAINT VEHICLE_FK_OWNER FOREIGN KEY (OwnerDni) REFERENCES OWNER ON DELETE CASCADE
+  CONSTRAINT VEHICLE_FK_OWNER FOREIGN KEY (OwnerDni) REFERENCES OWNER
 );
 
 CREATE TABLE LICENSE(
@@ -147,7 +147,8 @@ CREATE TABLE TICKET(
   CONSTRAINT TICKET_PK PRIMARY KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni),
   CONSTRAINT TICKET_FK_OWNER FOREIGN KEY (OwnerDni) REFERENCES OWNER ON DELETE CASCADE,
   CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
-  CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash'))
+  CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
+  CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionDate IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
 );
 
 CREATE TABLE ALLEGATION(
