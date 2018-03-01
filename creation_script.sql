@@ -20,6 +20,7 @@ CREATE TABLE OWNER(
   OwnerEmail VARCHAR2(50),
   OwnerBirth DATE NOT NULL,
   CONSTRAINT OWNER_PK PRIMARY KEY (OwnerDni),
+  CONSTRAINT OWNER_UK UNIQUE (OwnerEmail, OwnerMobile), /*peleas con el UNIQUE*/
   CONSTRAINT OWNER_EMAIL CHECK (OwnerEmail LIKE '%@%.%')
 );
 
@@ -34,6 +35,7 @@ CREATE TABLE DRIVER(
   DriverBirth DATE NOT NULL,
   ldate DATE NOT NULL, /*1:1 relation between Driver:License*/
   CONSTRAINT DRIVER_PK PRIMARY KEY (DriverDni),
+  CONSTRAINT DRIVER_UK UNIQUE (DriverMobile,DriverEmail),
   CONSTRAINT DRIVER_EMAIL CHECK (DriverEmail LIKE '%@%.%')
 );
 
@@ -47,7 +49,8 @@ CREATE TABLE VEHICLE(
   itv DATE NOT NULL,
   power VARCHAR2(6) NOT NULL,
   OwnerDni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Vehicle*/
-  CONSTRAINT VEHICLE_PK PRIMARY KEY (nPlate,VIN,registration),
+  CONSTRAINT VEHICLE_PK PRIMARY KEY (nPlate,VIN),
+  CONSTRAINT VEHICLE_UK UNIQUE (registration),
   CONSTRAINT VEHICLE_FK_OWNER FOREIGN KEY (OwnerDni) REFERENCES OWNER
 );
 
@@ -66,9 +69,9 @@ CREATE TABLE DRIVES_VEHICLE( /*n:n relation between Driver:Vehicle*/
   registration DATE NOT NULL,
   nPlate VARCHAR2(7) NOT NULL,
   VIN VARCHAR2(17) NOT NULL,
-  CONSTRAINT DRIVES_VEHICLE_PK PRIMARY KEY (DriverDni,registration,nPlate,VIN),
+  CONSTRAINT DRIVES_VEHICLE_PK PRIMARY KEY (DriverDni,nPlate,VIN),
   CONSTRAINT DRIVES_VEHICLE_FK_DRIVER FOREIGN KEY (DriverDni) REFERENCES DRIVER ON DELETE CASCADE,
-  CONSTRAINT DRIVES_VEHICLE_FK_VEHICLE FOREIGN KEY (nPlate,VIN,registration) REFERENCES VEHICLE ON DELETE CASCADE
+  CONSTRAINT DRIVES_VEHICLE_FK_VEHICLE FOREIGN KEY (nPlate,VIN) REFERENCES VEHICLE ON DELETE CASCADE
 );
 
 CREATE TABLE ROAD(
@@ -86,7 +89,7 @@ CREATE TABLE SECTION(
   */
   rname VARCHAR2(15) NOT NULL,
   CONSTRAINT SECTION_PK PRIMARY KEY (rname,sectionID),
-  CONSTRAINT SEECTION_FK_RADAR FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE,
+  CONSTRAINT SECTION_FK_RADAR FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE,
   CONSTRAINT SECTION_DURATION CHECK (durationKm <= 5)
 );
 
@@ -111,11 +114,10 @@ CREATE TABLE OBSERVATION(
   /*
 	1:n relation between Vehicle:Observation
   */
-  registration DATE NOT NULL,
   nPlate VARCHAR2(7) NOT NULL,
   VIN VARCHAR2(17) NOT NULL,
-  CONSTRAINT OBSERVATION_PK PRIMARY KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate),
-  CONSTRAINT OBSERVATION_FK_VEHICLE FOREIGN KEY (nPlate,VIN,registration) REFERENCES VEHICLE ON DELETE CASCADE,
+  CONSTRAINT OBSERVATION_PK PRIMARY KEY (nPlate,VIN,mileagepoint,rname,direction,otime,odate),
+  CONSTRAINT OBSERVATION_FK_VEHICLE FOREIGN KEY (nPlate,VIN) REFERENCES VEHICLE ON DELETE CASCADE,
   CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction) REFERENCES RADAR ON DELETE CASCADE
 );
 
@@ -134,7 +136,6 @@ CREATE TABLE TICKET(
   /*
 	1:n relation between Vehicle:Ticket
   */
-  registration DATE NOT NULL,
   nPlate VARCHAR2(7) NOT NULL,
   VIN VARCHAR2(17) NOT NULL,
   OwnerDni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Ticket*/
@@ -144,9 +145,9 @@ CREATE TABLE TICKET(
   payment VARCHAR2(14) NOT NULL,
   penalty NUMBER(5,2) NOT NULL,
   sanctionDate DATE NOT NULL,
-  CONSTRAINT TICKET_PK PRIMARY KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni),
+  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni),
   CONSTRAINT TICKET_FK_OWNER FOREIGN KEY (OwnerDni) REFERENCES OWNER ON DELETE CASCADE,
-  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
+  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (nPlate,VIN,mileagepoint,rname,direction,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
   CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionDate IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
 );
@@ -163,11 +164,10 @@ CREATE TABLE ALLEGATION(
   rname VARCHAR2(5) NOT NULL,
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
-  registration DATE NOT NULL,
   nPlate VARCHAR2(7) NOT NULL,
   VIN VARCHAR2(17) NOT NULL,
   OwnerDni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Allegation*/
-  CONSTRAINT ALLEGATION_PK PRIMARY KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni,registration_date),
-  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (registration,nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni) REFERENCES TICKET ON DELETE CASCADE,
+  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni,registration_date),
+  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,VIN,mileagepoint,rname,direction,otime,odate,OwnerDni) REFERENCES TICKET ON DELETE CASCADE,
   CONSTRAINT ALLEGATION_STATUS CHECK (status IN ('approved','rejected', 'under study'))
 );
