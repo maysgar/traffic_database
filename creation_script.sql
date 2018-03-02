@@ -26,7 +26,7 @@ CREATE TABLE OWNER(
 
 CREATE TABLE DRIVER(
   Dni VARCHAR2(9) NOT NULL,
-  type VARCHAR2(15) NOT NULL,
+  type VARCHAR2(3) NOT NULL,
   ldate DATE NOT NULL,
   age NUMBER(2) NOT NULL,
   CONSTRAINT DRIVER_PK PRIMARY KEY (Dni),
@@ -140,7 +140,7 @@ CREATE TABLE ALLEGATION(
 	1:n relation between Observation:Allegation
   */
   odate DATE NOT NULL,
-  otime DATE NOT NULL, 
+  otime DATE NOT NULL,
   rname VARCHAR2(5) NOT NULL,
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
