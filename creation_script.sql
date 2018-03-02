@@ -85,7 +85,7 @@ CREATE TABLE RADAR(
 
 CREATE TABLE OBSERVATION(
   odate DATE NOT NULL,
-  otime NUMBER(3) NOT NULL, /*Hay que ponerlo en formato TIME*/
+  otime DATE NOT NULL,
   speed NUMBER(5,2) NOT NULL,
   /*
 	1:n relation between Radars:Observation
@@ -107,7 +107,7 @@ CREATE TABLE TICKET(
     In general: 1:n relation between Observation:Ticket
   */
   odate DATE NOT NULL,
-  otime NUMBER(3) NOT NULL, /*Hay que ponerlo en formato TIME*/
+  otime DATE NOT NULL,
   /*
 	1:n relation between Radars:Ticket
   */
@@ -140,7 +140,7 @@ CREATE TABLE ALLEGATION(
 	1:n relation between Observation:Allegation
   */
   odate DATE NOT NULL,
-  otime NUMBER(3) NOT NULL, /*Hay que ponerlo en formato TIME*/
+  otime DATE NOT NULL, 
   rname VARCHAR2(5) NOT NULL,
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
