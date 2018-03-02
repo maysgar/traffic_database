@@ -1,7 +1,12 @@
 INSERT INTO USER (Name,Surname_1,Surname_2,Address,Town,Dni,Mobile,Email,Birth)
   SELECT DISTINCT NOMBRE_CONDTR,APELL_1_CONDTR,APELL_2_CONDTR,DIRECC_CONDTR,CIUDAD_CONDTR,NIF_CONDTR,TO_NUMBER(TLF_CONDTR,'999999999'),EMAIL_CONDTR,TO_DATE(CUMPLE_CONDTR,'YYYY-MM-DD')
     FROM FSDB.MEGATABLE;
-/*Insertando los drivers en la tabla USER cogemos tanto los owners como los drivers que no son owners*/
+/*Insertando los drivers en la tabla USER cogemos tanto los owners (parcialmente) como los drivers que no son owners*/
+
+INSERT INTO USER (Name,Surname_1,Surname_2,Address,Town,Dni,Mobile,Email,Birth)
+  SELECT DISTINCT NOMBRE_DUENO,APELL_1_DUENO,APELL_2_DUENO,DIRECC_DUENO,CIUDAD_DUENO,NIF_DUENO,TO_NUMBER(TLF_DUENO,'999999999'),EMAIL_DUENO,TO_DATE(CUMPLE_DUENO,'YYYY-MM-DD')
+    FROM FSDB.MEGATABLE WHERE NIF_DUENO != NIF_CONDTR;
+/*E insertando los owners, metemos en la tabla, los owners que no son drivers que no hayan sido metidos ya*/
 /**/
 
 INSERT INTO DRIVER (Dni,type,ldate,age)
