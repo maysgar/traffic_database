@@ -123,10 +123,10 @@ CREATE TABLE TICKET(
   due_date DATE NOT NULL,
   payment VARCHAR2(14) NOT NULL,
   penalty NUMBER(5,2) NOT NULL,
-  sanctionDate DATE NOT NULL,
+  sanctionDate VARCHAR2(10) NOT NULL,
   CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni),
   CONSTRAINT TICKET_FK_OWNER FOREIGN KEY (Dni) REFERENCES OWNER ON DELETE CASCADE,
-  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (nPlate,VIN,mileagepoint,rname,direction,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
+  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
   CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionDate IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
 );
