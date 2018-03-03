@@ -17,4 +17,6 @@ INSERT INTO DRIVER (DriverDni,type,ldate,age)
     FROM FSDB.MEGATABLE WHERE EDAD_CONDTR >= 18;
 /*
   203 real drivers
+
+  EQUALS 203 ROWS CREATED
 */
