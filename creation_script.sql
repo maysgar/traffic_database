@@ -59,7 +59,7 @@ CREATE TABLE DRIVES_VEHICLE( /*n:n relation between Driver:Vehicle*/
 
 CREATE TABLE ROAD(
   rname VARCHAR2(15),
-  speedlimit NUMBER(5,2) NOT NULL,
+  speedlimit NUMBER(3) NOT NULL,
   CONSTRAINT ROAD_PK PRIMARY KEY (rname),
   CONSTRAINT MAX_SPEED CHECK (speedlimit <= 120)
 );
@@ -67,7 +67,7 @@ CREATE TABLE ROAD(
 CREATE TABLE SECTION(
   sectionID NUMBER(5),
   durationKm NUMBER(1) NOT NULL,
-  speedlimitSection NUMBER(5,2) NOT NULL,
+  speedlimitSection NUMBER(3) NOT NULL,
   /*
     1:n relation between Road and Section
   */
@@ -80,10 +80,10 @@ CREATE TABLE SECTION(
 
 CREATE TABLE RADAR(
   rname VARCHAR2(5), /*1:n relation between Road:Radars*/
-  mileagepoint NUMBER(5,2),
+  mileagepoint NUMBER(3),
   direction VARCHAR2(5),
   speedlimit NUMBER(3),
-  CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction),
+  CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction,speedlimit),
   CONSTRAINT RADARDIRECTION_TYPE CHECK (direction IN ('ASC', 'DES')),
   CONSTRAINT MAX_SPEED_RADAR CHECK (speedlimit<= 120),
   CONSTRAINT RADAR_FK_ROAD FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE
@@ -97,16 +97,17 @@ CREATE TABLE OBSERVATION(
 	1:n relation between Radars:Observation
   */
   rname VARCHAR2(5),
-  mileagepoint NUMBER(5,2),
+  mileagepoint NUMBER(3),
   direction VARCHAR2(5),
+  speedlimit NUMBER(3),
   /*
 	1:n relation between Vehicle:Observation
   */
   nPlate VARCHAR2(7),
-  CONSTRAINT OBSERVATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate),
+  CONSTRAINT OBSERVATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate),
   CONSTRAINT OBSERVATION_FK_VEHICLE FOREIGN KEY (nPlate) REFERENCES VEHICLE ON DELETE CASCADE,
   CONSTRAINT MAX_SPEED_OBS CHECK (speed <= 500),
-  CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction) REFERENCES RADAR ON DELETE CASCADE
+  CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction,speedlimit) REFERENCES RADAR ON DELETE CASCADE
 );
 
 CREATE TABLE TICKET(
@@ -119,8 +120,9 @@ CREATE TABLE TICKET(
 	1:n relation between Radars:Ticket
   */
   rname VARCHAR2(5),
-  mileagepoint NUMBER(5,2),
+  mileagepoint NUMBER(3),
   direction VARCHAR2(5),
+  speedlimit NUMBER(3),
   /*
 	1:n relation between Vehicle:Ticket
   */
@@ -131,9 +133,9 @@ CREATE TABLE TICKET(
   due_date DATE NOT NULL,
   payment VARCHAR2(14) NOT NULL,
   sanctionState VARCHAR2(10) NOT NULL,
-  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni),
+  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni),
   CONSTRAINT TICKET_FK_PEOPLE FOREIGN KEY (Dni) REFERENCES PEOPLE ON DELETE CASCADE,
-  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
+  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
   CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionState IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
 );
@@ -148,11 +150,12 @@ CREATE TABLE ALLEGATION(
   odate DATE,
   otime DATE,
   rname VARCHAR2(5),
-  mileagepoint NUMBER(5,2),
+  mileagepoint NUMBER(3),
   direction VARCHAR2(5),
+  speedlimit NUMBER(3),
   nPlate VARCHAR2(7),
   Dni VARCHAR2(9), /*1:n relation between Owner:Allegation*/
-  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni,registration_date),
-  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni) REFERENCES TICKET ON DELETE CASCADE,
+  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni,registration_date),
+  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni) REFERENCES TICKET ON DELETE CASCADE,
   CONSTRAINT ALLEGATION_STATUS CHECK (status IN ('approved','rejected', 'under study'))
 );
