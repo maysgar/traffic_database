@@ -104,7 +104,7 @@ CREATE TABLE OBSERVATION(
 	1:n relation between Vehicle:Observation
   */
   nPlate VARCHAR2(7),
-  CONSTRAINT OBSERVATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate),
+  CONSTRAINT OBSERVATION_PK PRIMARY KEY (mileagepoint,rname,direction,otime,odate,nPlate),
   CONSTRAINT OBSERVATION_FK_VEHICLE FOREIGN KEY (nPlate) REFERENCES VEHICLE ON DELETE CASCADE,
   CONSTRAINT MAX_SPEED_OBS CHECK (speed <= 500),
   CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction,speedlimit) REFERENCES RADAR ON DELETE CASCADE
@@ -135,7 +135,7 @@ CREATE TABLE TICKET(
   sanctionState VARCHAR2(10) NOT NULL,
   CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni),
   CONSTRAINT TICKET_FK_PEOPLE FOREIGN KEY (Dni) REFERENCES PEOPLE ON DELETE CASCADE,
-  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate) REFERENCES OBSERVATION ON DELETE CASCADE,
+  CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (mileagepoint,rname,direction,otime,odate,nPlate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
   CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionState IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
 );
