@@ -82,8 +82,10 @@ CREATE TABLE RADAR(
   rname VARCHAR2(5) NOT NULL, /*1:n relation between Road:Radars*/
   mileagepoint NUMBER(5,2) NOT NULL,
   direction VARCHAR2(5) NOT NULL,
+  speedlimit NUMBER(3),
   CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction),
   CONSTRAINT RADARDIRECTION_TYPE CHECK (direction IN ('ASC', 'DESC')),
+  CONSTRAINT MAX_SPEED_RADAR CHECK (speedlimit<= 120),
   CONSTRAINT RADAR_FK_ROAD FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE
 );
 
