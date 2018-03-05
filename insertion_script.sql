@@ -6,8 +6,8 @@ INSERT INTO PEOPLE (Name,Surname_1,Surname_2,Address,Town,Dni,Mobile,Email,Birth
     FROM FSDB.MEGATABLE);
 /*
   248 ROWS CREATED
-*/	
-	
+*/
+
 /*	SELECT COUNT(*) FROM (((
 		SELECT DISTINCT NIF_DUENO
 			FROM FSDB.MEGATABLE
@@ -68,8 +68,10 @@ FROM FSDB.MEGATABLE;
   INSERT INTO RADAR (rname, mileagepoint, direction, speedlimit)
 	SELECT DISTINCT CARRETERA_FOTO, PTO_KM_RADAR, SENTIDO_RADAR, LIMIT_VEL_RADAR
     FROM FSDB.MEGATABLE;
-	
-	--436 rows 
+
+  --With speedlimit as PK of RADAR.
+
+	--436 rows
 */
 
 INSERT INTO RADAR (rname, mileagepoint, direction, speedlimit)
