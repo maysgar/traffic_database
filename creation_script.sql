@@ -90,7 +90,7 @@ CREATE TABLE RADAR(
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
   speedlimit NUMBER(3),
-  CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction,speedlimit),
+  CONSTRAINT RADAR_PK PRIMARY KEY (mileagepoint,rname,direction),
   CONSTRAINT RADARDIRECTION_TYPE CHECK (direction IN ('ASC', 'DES')),
   CONSTRAINT MAX_SPEED_RADAR CHECK (speedlimit<= 120),
   CONSTRAINT RADAR_FK_ROAD FOREIGN KEY (rname) REFERENCES ROAD ON DELETE CASCADE
@@ -106,7 +106,7 @@ CREATE TABLE OBSERVATION(
   rname VARCHAR2(5),
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
-  speedlimit NUMBER(3),
+  --speedlimit NUMBER(3),
   /*
 	1:n relation between Vehicle:Observation
   */
@@ -114,7 +114,7 @@ CREATE TABLE OBSERVATION(
   CONSTRAINT OBSERVATION_PK PRIMARY KEY (mileagepoint,rname,direction,otime,odate,nPlate),
   CONSTRAINT OBSERVATION_FK_VEHICLE FOREIGN KEY (nPlate) REFERENCES VEHICLE ON DELETE CASCADE,
   CONSTRAINT MAX_SPEED_OBS CHECK (speed <= 500),
-  CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction,speedlimit) REFERENCES RADAR ON DELETE CASCADE
+  CONSTRAINT OBSERVATION_FK_RADAR FOREIGN KEY (mileagepoint,rname,direction) REFERENCES RADAR ON DELETE CASCADE
 );
 
 CREATE TABLE TICKET(
@@ -129,7 +129,7 @@ CREATE TABLE TICKET(
   rname VARCHAR2(5),
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
-  speedlimit NUMBER(3),
+  --speedlimit NUMBER(3),
   /*
 	1:n relation between Vehicle:Ticket
   */
@@ -140,7 +140,7 @@ CREATE TABLE TICKET(
   due_date DATE NOT NULL,
   payment VARCHAR2(14) NOT NULL,
   sanctionState VARCHAR2(10) NOT NULL,
-  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni),
+  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni),
   CONSTRAINT TICKET_FK_PEOPLE FOREIGN KEY (Dni) REFERENCES OWNER ON DELETE CASCADE,
   CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (mileagepoint,rname,direction,otime,odate,nPlate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
@@ -159,10 +159,10 @@ CREATE TABLE ALLEGATION(
   rname VARCHAR2(5),
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
-  speedlimit NUMBER(3),
+  --speedlimit NUMBER(3),
   nPlate VARCHAR2(7),
   Dni VARCHAR2(9), /*1:n relation between Owner:Allegation*/
-  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni,registration_date),
-  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,speedlimit,otime,odate,Dni) REFERENCES TICKET ON DELETE CASCADE,
+  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni,registration_date),
+  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni) REFERENCES TICKET ON DELETE CASCADE,
   CONSTRAINT ALLEGATION_STATUS CHECK (status IN ('approved','rejected', 'under study'))
 );
