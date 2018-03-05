@@ -12,12 +12,12 @@ INSERT INTO PEOPLE (Name,Surname_1,Surname_2,Address,Town,Dni,Mobile,Email,Birth
 		SELECT DISTINCT NIF_DUENO
 			FROM FSDB.MEGATABLE
 			WHERE NOT NIF_DUENO = NIF_CONDTR)
-  --97 owners
+  --97 owners who do not drive
    UNION
   (SELECT DISTINCT NIF_CONDTR
 			FROM FSDB.MEGATABLE
 			WHERE NOT NIF_DUENO = NIF_CONDTR))
-  --107 drivers
+  --107 drivers which are not owners
 	UNION
   (SELECT NIF_DUENO
     FROM FSDB.MEGATABLE
@@ -32,6 +32,13 @@ INSERT INTO DRIVER (DriverDni,type,ldate,age)
     FROM FSDB.MEGATABLE WHERE EDAD_CONDTR >= 18;
 /*
   203 ROWS CREATED
+*/
+
+INSERT INTO OWNER (OwnerDni)
+  SELECT DISTINCT NIF_DUENO
+    FROM FSDB.MEGATABLE;
+/*
+  197 ROWS CREATED
 */
 
 INSERT INTO VEHICLE (nPlate,VIN,registration,brand,model,color,itv,Dni)
