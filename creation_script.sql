@@ -105,7 +105,6 @@ CREATE TABLE OBSERVATION(
   rname VARCHAR2(5),
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
-  --speedlimit NUMBER(3),
   /*
 	1:n relation between Vehicle:Observation
   */
@@ -128,19 +127,16 @@ CREATE TABLE TICKET(
   rname VARCHAR2(5),
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
-  --speedlimit NUMBER(3),
   /*
 	1:n relation between Vehicle:Ticket
   */
   nPlate VARCHAR2(7),
-  Dni VARCHAR2(9), /*1:n relation between Owner:Ticket*/
   amount NUMBER(5,2) NOT NULL,
   emission_date DATE NOT NULL,
   due_date DATE NOT NULL,
   payment VARCHAR2(14) NOT NULL,
   sanctionState VARCHAR2(10) NOT NULL,
   CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni),
-  CONSTRAINT TICKET_FK_PEOPLE FOREIGN KEY (Dni) REFERENCES OWNER ON DELETE CASCADE,
   CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (mileagepoint,rname,direction,otime,odate,nPlate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
   CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionState IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
@@ -158,10 +154,10 @@ CREATE TABLE ALLEGATION(
   rname VARCHAR2(5),
   mileagepoint NUMBER(3),
   direction VARCHAR2(5),
-  --speedlimit NUMBER(3),
   nPlate VARCHAR2(7),
-  Dni VARCHAR2(9), /*1:n relation between Owner:Allegation*/
-  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni,registration_date),
-  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni) REFERENCES TICKET ON DELETE CASCADE,
+  Dni VARCHAR2(9), /*1:n relation between Driver:Allegation*/
+  CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,registration_date),
+  CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate) REFERENCES TICKET ON DELETE CASCADE,
+  CONSTRAINT ALLEGATION_DRIVER_FK FOREIGN KEY (Dni) REFERENCES DRIVER ON DELETE CASCADE, --???
   CONSTRAINT ALLEGATION_STATUS CHECK (status IN ('approved','rejected', 'under study'))
 );
