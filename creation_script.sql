@@ -47,12 +47,13 @@ CREATE TABLE VEHICLE(
   registration DATE NOT NULL,
   brand VARCHAR2(12) NOT NULL,
   model VARCHAR2(12) NOT NULL,
+  power NUMBER(4) NOT NULL,
   color VARCHAR2(25) NOT NULL,
   itv DATE NOT NULL,
   Dni VARCHAR2(9) NOT NULL, /*1:n relation between Owner:Vehicle*/
   CONSTRAINT VEHICLE_PK PRIMARY KEY (nPlate),
   CONSTRAINT VEHICLE_UK UNIQUE (registration,VIN),
-  CONSTRAINT VEHICLE_FK_PEOPLE FOREIGN KEY (Dni) REFERENCES OWNER
+  CONSTRAINT VEHICLE_FK_PEOPLE FOREIGN KEY (Dni) REFERENCES OWNER ON DELETE CASCADE
 );
 
 CREATE TABLE DRIVES_VEHICLE( /*n:n relation between Driver:Vehicle*/
@@ -136,7 +137,7 @@ CREATE TABLE TICKET(
   due_date DATE NOT NULL,
   payment VARCHAR2(14) NOT NULL,
   sanctionState VARCHAR2(10) NOT NULL,
-  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,Dni),
+  CONSTRAINT TICKET_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate),
   CONSTRAINT TICKET_FK_OBSERVATION FOREIGN KEY (mileagepoint,rname,direction,otime,odate,nPlate) REFERENCES OBSERVATION ON DELETE CASCADE,
   CONSTRAINT TICKET_PAYMENT CHECK (payment IN ('credit card','bank transfer', 'cash')),
   CONSTRAINT TICKET_SANCTIONDATE CHECK (sanctionState IN ('Registered', 'Issued', 'Received', 'Fulflled', 'Non-paid'))
@@ -158,6 +159,6 @@ CREATE TABLE ALLEGATION(
   Dni VARCHAR2(9), /*1:n relation between Driver:Allegation*/
   CONSTRAINT ALLEGATION_PK PRIMARY KEY (nPlate,mileagepoint,rname,direction,otime,odate,registration_date),
   CONSTRAINT ALLEGATION_FK_TICKET FOREIGN KEY (nPlate,mileagepoint,rname,direction,otime,odate) REFERENCES TICKET ON DELETE CASCADE,
-  CONSTRAINT ALLEGATION_DRIVER_FK FOREIGN KEY (Dni) REFERENCES DRIVER ON DELETE CASCADE, --???
+  CONSTRAINT ALLEGATION_DRIVER_FK FOREIGN KEY (Dni,nPlate) REFERENCES DRIVES_VEHICLE ON DELETE CASCADE, 
   CONSTRAINT ALLEGATION_STATUS CHECK (status IN ('approved','rejected', 'under study'))
 );
