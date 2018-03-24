@@ -1,4 +1,5 @@
 /*----------------------------QUERY A--------------------------*/
+/* The top 10 vehicles most 'observed' in the course of today. */
 SELECT n_plate, COUNT(n_plate) AS appearance
 FROM OBSERVATIONS
 WHERE ROWNUM = 10 AND date = sysdate
@@ -6,6 +7,9 @@ ORDER BY appearance DESC
 WITH READ ONLY CONSTRAINT R_ONLY;
 
 /*----------------------------QUERY B--------------------------*/
+/* List of roads and their average speed limit, ordered from highest to lowest speed in the first instance and in alphabetical order of roads in second,
+counting both directions. */
+
 SELECT speed_limit, name
 FROM(
 SELECT speed_limit
@@ -19,15 +23,23 @@ ORDER BY name ASC
 WITH READ ONLY CONSTRAINT R_ONLY;
 
 /*----------------------------QUERY C--------------------------*/
+/* People who do not drive any of their vehicles (neither as a regular driver nor
+as an additional driver). */
+
 SELECT name, surname
 FROM(
   PERSONS NATURAL JOIN (SELECT DISTINCT person FROM DRIVERS DISJOINT VEHICLES)
 );
 
 /*----------------------------QUERY D--------------------------*/
+/* Boss: owners of at least three cars they don’t drive. */
+
 SELECT name, surname, COUNT(n_plate) AS vehicles_owned
 FROM PEOPLE
 WHERE vehicles_owned >= 3 AND
 WITH READ ONLY CONSTRAINT R_ONLY;
 
 /*----------------------------QUERY E--------------------------*/
+/* Evolution: indicates the difference of income due to tickets fines between the
+last month and the same month of the previous year. */
+
