@@ -11,21 +11,9 @@ ORDER BY appearance DESC;
 /* List of roads and their average speed limit, ordered from highest to lowest speed in the first instance and in alphabetical order of roads in second,
 counting both directions. */
 
-SELECT speed_limit, name
-FROM(
-SELECT speed_limit
-FROM ROADS
-ORDER BY speed_limit DESC
-??
-SELECT name
-FROM ROADS
-ORDER BY name ASC
-)
-WITH READ ONLY CONSTRAINT R_ONLY;
-
 SELECT name, speed_limit
 FROM(
-SELECT speed_limit
+SELECT name, speed_limit
 FROM ROADS
 ORDER BY name ASC;
 )
