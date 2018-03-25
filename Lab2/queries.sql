@@ -1,10 +1,11 @@
 /*----------------------------QUERY A--------------------------*/
 /* The top 10 vehicles most 'observed' in the course of today. */
-SELECT n_plate, COUNT(n_plate) AS appearance
+SELECT nPlate, COUNT(nPlate) AS appearance
 FROM OBSERVATIONS
-WHERE ROWNUM = 10 AND date = sysdate
-ORDER BY appearance DESC
-WITH READ ONLY CONSTRAINT R_ONLY;
+WHERE ROWNUM = 10 AND odatetime = sysdate
+GROUP BY nPlate, appearance
+ORDER BY appearance DESC;
+-- WITH READ ONLY CONSTRAINT R_ONLY;
 
 /*----------------------------QUERY B--------------------------*/
 /* List of roads and their average speed limit, ordered from highest to lowest speed in the first instance and in alphabetical order of roads in second,
