@@ -23,6 +23,17 @@ ORDER BY name ASC
 )
 WITH READ ONLY CONSTRAINT R_ONLY;
 
+SELECT name, speed_limit
+FROM(
+SELECT speed_limit
+FROM ROADS
+ORDER BY name ASC;
+)
+GROUP BY name
+ORDER BY speed_limit DESC;
+
+
+
 /*----------------------------QUERY C--------------------------*/
 /* People who do not drive any of their vehicles (neither as a regular driver nor
 as an additional driver). */
