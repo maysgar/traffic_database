@@ -7,11 +7,10 @@ with the legal margin, to support the analysis of the convenience of this norm. 
 CREATE OR REPLACE VIEW sanction_low_speed AS
 SELECT nPlate, odatetime, ((speedlim/2) - speed) AS speed_difference
 FROM(
-    SELECT nPlate, odatetime, speed
-    FROM OBSERVATIONS
-    UNION
-    SELECT speedlim 
-    FROM RADARS
+    SELECT road, km_point, direction FROM OBSERVATIONS A
+    NATURAL JOIN
+    SELECT road, km_point, direction FROM RADARS B
+    ON A.road = B.road, A.km_point = B.km_point, A.direction = B.direction
 )
 WHERE speed <= (speedlim/2);
 
