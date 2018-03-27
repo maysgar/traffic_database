@@ -61,7 +61,6 @@ Results expected:
 - 450€ ok
 - 270€ ok
 - 0€ ok
-
 */
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
@@ -80,11 +79,15 @@ RETURN NUMBER
 IS
   date_1 VARCHAR2(28);
   date_2 VARCHAR2(28);
+  date_aux_1 DATE;
+  date_aux_2 DATE;
   distance NUMBER(3);
   time_elapsed INTEGER := 0;
   total_amount NUMBER(4);
   boolean_aux INTEGER := 0;
   amount_fine INTEGER := 10;
+
+  --  Two queries for two different vehicles observed by the same radar
 
   CURSOR vehicle_to_be_fined (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
@@ -104,22 +107,29 @@ IS
 
 BEGIN
     IF vehicle_to_be_fined %ISOPEN THEN
-      CLOSE vehicle_1;
+      CLOSE vehicle_to_be_fined;
     END IF;
     IF vehicle_2 %ISOPEN THEN
       CLOSE vehicle_2;
     END IF;
 
+    total_amount := 0;
+
     FOR i IN vehicle_to_be_fined(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
     LOOP
-      date_1 := CAST(i.odatetime AS VARCHAR2(28));
+      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI.SS.FF');
+      date_aux_1 := TO_DATE(date_1,'HH.MI.SS.FF');
       FOR i IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
       LOOP
-        date_2 := CAST(i.odatetime AS VARCHAR2(28));
-        --calculo de la diferencia entre observaciones
-        time_elapsed := TO_NUMBER(TO_DATE(date_1, 'SS.FF')) - TO_NUMBER(TO_DATE(date_2, 'SS.FF'));
-        IF TO_DATE(date_1, 'MM-DD-YY') = TO_DATE(date_2, 'MM-DD-YY') AND
-           THEN
+        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI.SS.FF');
+        date_aux_2 := TO_DATE(date_2,'HH.MI.SS.FF');
+        time_elapsed := TO_NUMBER(EXTRACT(date_aux_1, 'SS.FF')) - TO_NUMBER(EXTRACT(date_aux_2, 'SS.FF'));
+        /*
+          If the the day, month and year side by side with the hour and the minutes
+          are the same for two observations of a different vehicle, and the time_elapsed
+          between two observations is less than the legal time, then a fine is produced
+        */
+        IF TO_DATE(date_1, 'MM-DD-YY HH.MI') = TO_DATE(date_2, 'MM-DD-YY HH.MI') AND time_elapsed < 3.6 THEN
           boolean_aux := 1;
           time_elapsed := ABS(3.6-time_elapsed);
           EXIT WHEN boolean_aux = 1;
@@ -131,10 +141,29 @@ BEGIN
     --ACCESS HERE WHEN THE time_elapsed HAS BEEN CALCULATED AND THE EXIT COMMAND
     --HAS BEEN EXECUTED.
     total_amount := CEIL(time_elapsed*amount_fine);
-    BMS_OUTPUT.PUT_LINE(total_amount);
+    DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
 
 END; /
+
+/*
+PRUEBAS:
+
+SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+FROM OBSERVATIONS a JOIN ROADS b
+ON a.road = b.name
+WHERE road = '' and direction = '' and TO_CHAR(odatetime, 'HH.MI') = '';
+
+declare
+result number;
+begin
+result:=safety_distance('3422AEU','','M50',15,'ASC');
+end;
+/
+
+Results expected:
+- 90€ ok
+*/
 
 -- Observation immediately prior to a given observation (of the same radar)
 
