@@ -1,3 +1,5 @@
+set serveroutput on;
+
 -- Amount for a ‘exceeding maximum speed’ radar sanction.
 --SPEED SANCTION IS 10€ PER km/h ABOVE THE SPEED LIMITED ROUNDED HIGH
 
@@ -5,11 +7,12 @@ CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_inp
  km_point_input NUMBER, direction_input VARCHAR2)
 RETURN NUMBER
 IS
-  amount_fine NUMBER;
-  partial_amount NUMBER;
-  total_amount NUMBER;
+  amount_fine INTEGER := 10;
+  partial_amount NUMBER(4);
+  total_amount NUMBER(4);
 
-  CURSOR vehicle_fined (vehicle_input) IS
+  CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
+   km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction
     FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
@@ -21,13 +24,13 @@ BEGIN
       CLOSE vehicle_fined;
     END IF;
 
-    amount_fine := 10;
     total_amount := 0;
+    partial_amount := 0;
 
-    FOR index IN vehicle_fined(vehicle_input, road_input)
+    FOR i IN vehicle_fined(vehicle_input,road_input,km_point_input,direction_input)
     LOOP
-      IF index.speed > index.speed_limit
-        partial_amount := index.speed - index.speed_limit;
+      IF i.speed > i.speed_limit THEN
+        partial_amount := i.speed - i.speed_limit;
       END IF;
     END LOOP;
 
@@ -36,7 +39,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
 
-END; /
+END;
 
 /*
 PRUEBAS:
@@ -52,10 +55,10 @@ end;
 /
 
 Results expected:
-- 90€
-- 450€
-- 270€
-- 0€
+- 90€ ok
+- 450€ ok
+- 270€ ok
+- 0€ ok
 
 */
 
