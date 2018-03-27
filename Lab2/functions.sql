@@ -41,6 +41,8 @@ BEGIN
 
 END;
 
+--Es cumulativo, por cada observacion realizada en dicho radar ???
+
 /*
 PRUEBAS:
 
@@ -59,7 +61,6 @@ Results expected:
 - 450€ ok
 - 270€ ok
 - 0€ ok
-
 */
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
@@ -72,24 +73,104 @@ END; /
 
 -- Amount for a ‘safety distance’ radar sanction.
 
-CREATE OR REPLACE FUNCTION safety_distance ()
+CREATE OR REPLACE FUNCTION safety_distance (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2,
+ road_input VARCHAR2, km_point_input NUMBER, direction_input VARCHAR2)
 RETURN NUMBER
 IS
+  date_1 VARCHAR2(28);
+  date_2 VARCHAR2(28);
+  date_aux_1 TIMESTAMP;
+  date_aux_2 TIMESTAMP;
+  distance NUMBER(3);
+  time_elapsed INTEGER := 0;
+  total_amount NUMBER(4);
+  boolean_aux INTEGER := 0;
+  amount_fine INTEGER := 10;
+
+  --  Two queries for two different vehicles observed by the same radar
+
+  CURSOR vehicle_to_be_fined (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
+   km_point_input NUMBER, direction_input VARCHAR2) IS
+    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
+    WHERE nPlate = vehicle_input_1 AND road = road_input AND km_point = km_point_input
+      AND direction = direction_input;
+
+  CURSOR vehicle_2 (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
+   km_point_input NUMBER, direction_input VARCHAR2) IS
+    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
+    WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
+      AND direction = direction_input;
+
 BEGIN
+    IF vehicle_to_be_fined %ISOPEN THEN
+      CLOSE vehicle_to_be_fined;
+    END IF;
+    IF vehicle_2 %ISOPEN THEN
+      CLOSE vehicle_2;
+    END IF;
+
+    total_amount := 0;
+
+    FOR i IN vehicle_to_be_fined(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
+    LOOP
+      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI');
+      date_aux_1 := i.odatetime;
+      FOR i IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
+      LOOP
+        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI');
+        date_aux_2 := i.odatetime;
+        time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM date_aux_1)) - TO_NUMBER(EXTRACT(SECOND FROM date_aux_2)));
+        /*
+          If the the day, month and year side by side with the hour and the minutes
+          are the same for two observations of a different vehicle, and the time_elapsed
+          between two observations is less than the legal time, then a fine is produced
+        */
+        --Error posiblemente aqui
+        IF TO_DATE(date_1, 'MM-DD-YY HH.MI') = TO_DATE(date_2, 'MM-DD-YY HH.MI') AND time_elapsed < 3.6 THEN
+          boolean_aux := 1;
+          time_elapsed := 3.6-time_elapsed;
+          EXIT WHEN boolean_aux = 1;
+        END IF;
+      END LOOP;
+      EXIT WHEN boolean_aux = 1;
+    END LOOP;
+
+    --ACCESS HERE WHEN THE time_elapsed HAS BEEN CALCULATED AND THE EXIT COMMAND
+    --HAS BEEN EXECUTED.
+    total_amount := CEIL(time_elapsed*amount_fine);
+    DBMS_OUTPUT.PUT_LINE(total_amount);
+    RETURN total_amount;
+
 END; /
+
+/*
+PRUEBAS:
+
+declare
+result number;
+begin
+result:=safety_distance('0716AUU','7607OAA','M50',66,'ASC');
+end;
+/
+
+Results expected:
+- 0€ NOT ok (100€)
+*/
 
 -- Observation immediately prior to a given observation (of the same radar)
 
 CREATE OR REPLACE FUNCTION obs_right_after_radar ()
-RETURN
-IS
+RETURN OBSERVATIONS%ROWTYPE AS obs_row_f1%ROWTYPE;
 BEGIN
 END; /
 
 -- Observation immediately prior to a given observation (of the same vehicle)
 
 CREATE OR REPLACE FUNCTION obs_right_after_vehicle ()
-RETURN
-IS
+RETURN OBSERVATIONS%ROWTYPE AS obs_row_f2%ROWTYPE;
 BEGIN
 END; /
