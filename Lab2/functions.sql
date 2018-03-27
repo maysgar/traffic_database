@@ -91,7 +91,7 @@ IS
 
   CURSOR vehicle_to_be_fined (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime, TO_NUMBER(EXTRACT(SECOND FROM odatetime)) "obs_in_sec_1"
     FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input_1 AND road = road_input AND km_point = km_point_input
@@ -99,7 +99,7 @@ IS
 
   CURSOR vehicle_2 (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime, TO_NUMBER(EXTRACT(SECOND FROM odatetime)) "obs_in_sec_2"
     FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
@@ -118,12 +118,10 @@ BEGIN
     FOR i IN vehicle_to_be_fined(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
     LOOP
       date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI.SS.FF');
-      date_aux_1 := TO_DATE(date_1,'HH.MI.SS.FF');
       FOR i IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
       LOOP
         date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI.SS.FF');
-        date_aux_2 := TO_DATE(date_2,'HH.MI.SS.FF');
-        time_elapsed := TO_NUMBER(EXTRACT(date_aux_1, 'SS.FF')) - TO_NUMBER(EXTRACT(date_aux_2, 'SS.FF'));
+        time_elapsed := i.obs_in_sec_1 - i.obs_in_sec_2;
         /*
           If the the day, month and year side by side with the hour and the minutes
           are the same for two observations of a different vehicle, and the time_elapsed
