@@ -117,11 +117,11 @@ BEGIN
 
     FOR i IN vehicle_to_be_fined(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
     LOOP
-      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI.SS.FF');
+      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI');
       date_aux_1 := i.odatetime;
       FOR i IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
       LOOP
-        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI.SS.FF');
+        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI');
         date_aux_2 := i.odatetime;
         time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM date_aux_1)) - TO_NUMBER(EXTRACT(SECOND FROM date_aux_2)));
         /*
@@ -129,6 +129,7 @@ BEGIN
           are the same for two observations of a different vehicle, and the time_elapsed
           between two observations is less than the legal time, then a fine is produced
         */
+        --Error posiblemente aqui
         IF TO_DATE(date_1, 'MM-DD-YY HH.MI') = TO_DATE(date_2, 'MM-DD-YY HH.MI') AND time_elapsed < 3.6 THEN
           boolean_aux := 1;
           time_elapsed := 3.6-time_elapsed;
@@ -149,20 +150,15 @@ END; /
 /*
 PRUEBAS:
 
-SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-FROM OBSERVATIONS a JOIN ROADS b
-ON a.road = b.name
-WHERE road = '' and direction = '' and TO_CHAR(odatetime, 'HH.MI') = '';
-
 declare
 result number;
 begin
-result:=safety_distance('3422AEU','','M50',15,'ASC');
+result:=safety_distance('0716AUU','7607OAA','M50',66,'ASC');
 end;
 /
 
 Results expected:
-- 90€ ok
+- 0€ NOT ok (100€)
 */
 
 -- Observation immediately prior to a given observation (of the same radar)
