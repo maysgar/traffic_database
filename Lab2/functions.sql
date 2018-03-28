@@ -7,6 +7,7 @@ set serveroutput on;
 
 -- Amount for a ‘exceeding maximum speed’ radar sanction.
 --SPEED SANCTION IS 10€ PER km/h ABOVE THE SPEED LIMITED ROUNDED HIGH
+--speed limit of the radar or the speed limit of the road?
 
 CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
  km_point_input NUMBER, direction_input VARCHAR2)
