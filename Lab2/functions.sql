@@ -1,5 +1,10 @@
 set serveroutput on;
 
+/*
+  All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
+  are involved and have to be given as an input
+*/
+
 -- Amount for a ‘exceeding maximum speed’ radar sanction.
 --SPEED SANCTION IS 10€ PER km/h ABOVE THE SPEED LIMITED ROUNDED HIGH
 
