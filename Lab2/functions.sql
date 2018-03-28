@@ -86,6 +86,7 @@ IS
   total_amount NUMBER(4);
   boolean_aux INTEGER := 0;
   amount_fine INTEGER := 10;
+  partial_amount INTEGER := 0;
 
   --  Two queries for two different vehicles observed by the same radar
 
@@ -129,23 +130,16 @@ BEGIN
           are the same for two observations of a different vehicle, and the time_elapsed
           between two observations is less than the legal time, then a fine is produced
         */
-        --Error posiblemente aqui
-        DBMS_OUTPUT.PUT_LINE('date_1: ' + date_1);
-        DBMS_OUTPUT.PUT_LINE('date_2: ' + date_2);
-        DBMS_OUTPUT.PUT_LINE('time_elapsed: ' + time_elapsed + ' with aux1: ' +
-          TO_NUMBER(EXTRACT(SECOND FROM date_aux_1) + ' and aux2: ' + TO_NUMBER(EXTRACT(SECOND FROM date_aux_2));
         IF date_1 = date_2 AND time_elapsed < 3.6 THEN
           boolean_aux := 1;
-          time_elapsed := 3.6-time_elapsed;
+          partial_amount := 3.6-time_elapsed;
           EXIT WHEN boolean_aux = 1;
         END IF;
       END LOOP;
       EXIT WHEN boolean_aux = 1;
     END LOOP;
 
-    --ACCESS HERE WHEN THE time_elapsed HAS BEEN CALCULATED AND THE EXIT COMMAND
-    --HAS BEEN EXECUTED.
-    total_amount := CEIL(time_elapsed*amount_fine);
+    total_amount := CEIL(partial_amount*amount_fine);
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
 
@@ -162,7 +156,7 @@ end;
 /
 
 Results expected:
-- 0€ NOT ok (100€)
+- 0€ ok, no observation between the two vehicles has been made in <3.6 seconds apart.
 */
 
 -- Observation immediately prior to a given observation (of the same radar)
