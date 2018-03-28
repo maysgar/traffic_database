@@ -9,7 +9,35 @@ b) Process allegations: if the new debtor is not assigned to the vehicle,
  study).
 */
 
+CREATE OR REPLACE TRIGGER pr_alleg
+BEFORE UPDATE
+ON ALLEGATIONS
+FOR EACH ROW
+DECLARE
+assigned INTEGER := 0;
+alleged INTEGER := 0;
+BEGIN
+  --Query to see if the new_debtor has an associated vehicle
+  SELECT COUNT(*) INTO assigned FROM(
+    SELECT nPlate,new_debtor FROM ALLEGATIONS a JOIN PERSONS p ON a.new_debtor = p.dni
+    JOIN VEHICLES v ON v.reg_driver = a.new_debtor
+    WHERE new_debtor = :new.new_debtor);
 
+  SELECT COUNT(*) INTO alleged FROM(
+    SELECT debtor,new_debtor FROM ALLEGATIONS a JOIN PERSONS p ON a.new_debtor = p.dni
+    JOIN TICKETS t ON t.debtor = a.new_debtor
+    WHERE new_debtor = :new.new_debtor);
+
+  IF assigned > 0 THEN
+    INSERT status := 'Rejected';
+  ELSE
+    IF alleged > 0 THEN
+      INSERT status := 'Under Study';
+    ELSE
+      INSERT status := 'Approved';
+    END IF;
+  END IF;
+END pr_alleg;
 
 /*c) King_is_dead: when a regular driver dies (the attribute is nullified in
   the row of the vehicle) a new regular driver will be assigned from among
@@ -17,7 +45,13 @@ b) Process allegations: if the new debtor is not assigned to the vehicle,
   were none, the operation will be prevented.
 */
 
+CREATE OR REPLACE TRIGGER king_is_dead
+BEFORE UPDATE
+ON VEHICLES
+FOR EACH ROW
+BEGIN
 
+END king_is_dead;
 
 /*d) Restrictions: observe that the speed of any radar is less than or equal
   to the general speed of the road, and that drivers are at least 18 years old.
@@ -30,7 +64,7 @@ DECLARE
   spot INTEGER := 0;
   speedlimit INTEGER := 0;
 BEGIN
-  --Selecting the speed limits of the radar and road
+  --Selecting the speed limits of the road
   SELECT speed_limit INTO speedlimit FROM(
     SELECT speed_limit FROM ROADS WHERE :new.road = name);
 
@@ -54,9 +88,9 @@ END restriction_speed_radar;
   INSERT INTO RADARS VALUES('M50',401,'DES',100);
 
   Expected:
-  - above speed
-  - same spot
-  - normal speed
+  - above speed ok
+  - same spot ok
+  - normal speed ok
 */
 
 CREATE OR REPLACE TRIGGER restriction_driver_age
@@ -66,8 +100,8 @@ FOR EACH ROW
 DECLARE
 identif INTEGER := 0;
 BEGIN
-  --Selecting the drivers' dni and drivers' age
-  SELECT dni INTO identif FROM(
+  --Selecting the drivers' dni
+  SELECT COUNT(*) INTO identif FROM(
     SELECT dni FROM PERSONS WHERE dni = :new.dni);
 
   IF identif > 0 THEN
@@ -88,6 +122,6 @@ END restriction_driver_age;
 
   Expected:
   - +18 years ok
-  - same person 
+  - same person ok
   - <18 year ok
 */
