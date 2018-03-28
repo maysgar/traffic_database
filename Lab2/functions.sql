@@ -117,11 +117,11 @@ BEGIN
 
     FOR i IN vehicle_to_be_fined(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
     LOOP
-      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI');
+      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
       date_aux_1 := i.odatetime;
       FOR i IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
       LOOP
-        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH.MI');
+        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
         date_aux_2 := i.odatetime;
         time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM date_aux_1)) - TO_NUMBER(EXTRACT(SECOND FROM date_aux_2)));
         /*
@@ -130,7 +130,11 @@ BEGIN
           between two observations is less than the legal time, then a fine is produced
         */
         --Error posiblemente aqui
-        IF TO_DATE(date_1, 'MM-DD-YY HH.MI') = TO_DATE(date_2, 'MM-DD-YY HH.MI') AND time_elapsed < 3.6 THEN
+        DBMS_OUTPUT.PUT_LINE('date_1: ' + date_1);
+        DBMS_OUTPUT.PUT_LINE('date_2: ' + date_2);
+        DBMS_OUTPUT.PUT_LINE('time_elapsed: ' + time_elapsed + ' with aux1: ' +
+          TO_NUMBER(EXTRACT(SECOND FROM date_aux_1) + 'and aux2: ' + TO_NUMBER(EXTRACT(SECOND FROM date_aux_2));
+        IF date_1 = date_2 AND time_elapsed < 3.6 THEN
           boolean_aux := 1;
           time_elapsed := 3.6-time_elapsed;
           EXIT WHEN boolean_aux = 1;
