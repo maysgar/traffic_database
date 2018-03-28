@@ -133,7 +133,7 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('date_1: ' + date_1);
         DBMS_OUTPUT.PUT_LINE('date_2: ' + date_2);
         DBMS_OUTPUT.PUT_LINE('time_elapsed: ' + time_elapsed + ' with aux1: ' +
-          TO_NUMBER(EXTRACT(SECOND FROM date_aux_1) + 'and aux2: ' + TO_NUMBER(EXTRACT(SECOND FROM date_aux_2));
+          TO_NUMBER(EXTRACT(SECOND FROM date_aux_1) + ' and aux2: ' + TO_NUMBER(EXTRACT(SECOND FROM date_aux_2));
         IF date_1 = date_2 AND time_elapsed < 3.6 THEN
           boolean_aux := 1;
           time_elapsed := 3.6-time_elapsed;
