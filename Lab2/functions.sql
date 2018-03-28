@@ -69,7 +69,7 @@ Results expected:
 */
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
-
+--La seccion se delimita en el input?
 CREATE OR REPLACE FUNCTION exceeding_section_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
  km_point_input_1 NUMBER, direction_input VARCHAR2, km_point_input_2 NUMBER)
 RETURN NUMBER
@@ -112,11 +112,13 @@ BEGIN
       CLOSE vehicle_fined_radar_2;
     END IF;
 
+    total_amount := 0;
+
     FOR i IN vehicle_fined_radar_1(vehicle_input,road_input,km_point_input_1,direction_input)
     LOOP
       begin_section := i.km_point;
       date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
-      FOR j IN vehicle_fined_radar_1(vehicle_input,road_input,km_point_input_2,direction_input)
+      FOR j IN vehicle_fined_radar_2(vehicle_input,road_input,km_point_input_2,direction_input)
       LOOP
         end_section := j.km_point;
         date_2 := TO_CHAR(j.odatetime,'MM-DD-YY HH24.MI');
