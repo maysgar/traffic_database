@@ -26,29 +26,68 @@ CREATE OR REPLACE TRIGGER restriction_speed_radar
 BEFORE INSERT OR UPDATE
 ON RADARS
 FOR EACH ROW
+DECLARE
+  spot INTEGER := 0;
+  speedlimit INTEGER := 0;
 BEGIN
   --Selecting the speed limits of the radar and road
-  SELECT speedlim, speed_limit
-  FROM RADARS a JOIN ROADS b
-  ON a.road = b.name
-  WHERE speedlim = :new.speedlim AND speed_limit = :new.speed_limit;
+  SELECT speed_limit INTO speedlimit FROM(
+    SELECT speed_limit FROM ROADS WHERE :new.road = name);
 
-  IF :new.speedlim > :new.speed_limit THEN
+  SELECT COUNT(*) INTO spot FROM(
+    SELECT road,km_point,direction FROM RADARS WHERE road = :new.road AND km_point = :new.km_point AND direction = :new.direction);
+  --If there is already a radar in the same spot...
+  IF spot > 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Radar cannot be registered: Already a radar in that spot');
+  END IF;
+
+  IF :new.speedlim > speedlimit THEN
     RAISE_APPLICATION_ERROR(-20001, 'Radar cannot be registered, speed is above the permitted');
   END IF;
 END restriction_speed_radar;
 
+/*
+  Pruebas:
+
+  INSERT INTO RADARS VALUES('M50',323,'ASC',200);
+  INSERT INTO RADARS VALUES('A1',217,'ASC',80);
+  INSERT INTO RADARS VALUES('M50',401,'DES',100);
+
+  Expected:
+  - above speed
+  - same spot
+  - normal speed
+*/
+
 CREATE OR REPLACE TRIGGER restriction_driver_age
 BEFORE INSERT OR UPDATE
-ON DRIVERS
+ON PERSONS
 FOR EACH ROW
+DECLARE
+identif INTEGER := 0;
 BEGIN
   --Selecting the drivers' dni and drivers' age
-  SELECT dni,months_between(TRUNC(sysdate)-birthdate)/12 as age
-  FROM PERSONS NATURAL JOIN DRIVERS
-  WHERE birthdate = :new.birthdate;
+  SELECT dni INTO identif FROM(
+    SELECT dni FROM PERSONS WHERE dni = :new.dni);
 
-  IF months_between(TRUNC(sysdate)-:new.birthdate)/12 < 18 THEN
+  IF identif > 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'Person cannot be registered: Person is already registered');
+  END IF;
+
+  IF months_between(TRUNC(sysdate),:new.birthdate)/12 < 18 THEN
     RAISE_APPLICATION_ERROR(-20001, 'Driver is under age, cannot be registered');
   END IF;
 END restriction_driver_age;
+
+/*
+  Pruebas:
+
+  INSERT INTO PERSONS VALUES('12345678P','g','g','','calle inventada','madrid','','',TO_DATE('1997-08-22','YYYY-MM-DD'));
+  INSERT INTO PERSONS VALUES('12345678P','g','g','','calle inventada','madrid','','',TO_DATE('1997-08-22','YYYY-MM-DD'));
+  INSERT INTO PERSONS VALUES('12345678Q','g','g','','calle inventada','madrid','','',TO_DATE('2018-01-01','YYYY-MM-DD'));
+
+  Expected:
+  - +18 years ok
+  - same person 
+  - <18 year ok
+*/
