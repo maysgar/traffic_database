@@ -70,11 +70,81 @@ Results expected:
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
 
-CREATE OR REPLACE FUNCTION exceeding_section_speed ()
+CREATE OR REPLACE FUNCTION exceeding_section_speed (vehicle_input VARCHAR2, road_input_1 VARCHAR2,
+ km_point_input_1 NUMBER, direction_input_1 VARCHAR2,road_input_2 VARCHAR2, km_point_input_2 NUMBER, direction_input_2 VARCHAR2)
 RETURN NUMBER
 IS
+  date_1 VARCHAR2(28);
+  date_2 VARCHAR2(28);
+  amount_fine INTEGER := 10;
+  partial_amount NUMBER(4);
+  total_amount NUMBER(4);
+  begin_section INTEGER := 0;
+  end_section INTEGER := 0;
+  section_km INTEGER := 0;
+  boolean_aux INTEGER := 0;
+  max_speed INTEGER := 0;
+
+  --Two radars are input as we want a section to be observed
+  --Same car has been observed in two radars, likely in the same section
+  CURSOR vehicle_fined_radar_1 (vehicle_input VARCHAR2, road_input_1 VARCHAR2,
+   km_point_input_1 NUMBER, direction_input_1 VARCHAR2) IS
+    SELECT nPlate, speed, road, speed_limit, km_point, direction
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
+    WHERE nPlate = vehicle_input AND road = road_input_1 AND km_point = km_point_input_1
+      AND direction = direction_input_1;
+
+  CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input_2 VARCHAR2,
+   km_point_input_2 NUMBER, direction_input_2 VARCHAR2) IS
+    SELECT nPlate, speed, road, speed_limit, km_point, direction
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
+    WHERE nPlate = vehicle_input AND road = road_input_2 AND km_point = km_point_input_2
+      AND direction = direction_input_2;
+
 BEGIN
-END; /
+
+    IF vehicle_fined_radar_1 %ISOPEN THEN
+      CLOSE vehicle_fined_radar_1;
+    END IF;
+    IF vehicle_fined_radar_2 %ISOPEN THEN
+      CLOSE vehicle_fined_radar_2;
+    END IF;
+
+    FOR i IN vehicle_fined_radar_1(vehicle_input,road_input_1,km_point_input_1,direction_input_1)
+    LOOP
+      begin_section := i.km_point;
+      date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
+      FOR j IN vehicle_fined_radar_1(vehicle_input,road_input_1,km_point_input_1,direction_input_1)
+      LOOP
+        end_section := j.km_point;
+        date_2 := TO_CHAR(j.odatetime,'MM-DD-YY HH24.MI');
+        section_km := ABS(begin_section-end_section);
+        --Section is delimited by 5 km or less, if any radar is set before that mark
+        --If the observations has been made the same exact day varying only on the seconds
+        --And if the two radars delimite a section, then proceed to calculate the fine
+        IF section_km <= 5 AND date_1 = date_2 THEN
+          --Select the maximum speed of both radars
+          max_speed := GREATEST(i.speed,j.speed);
+          --Suposing that a section has one value of speed_limit
+          IF max_speed > i.speed_limit THEN
+            boolean_aux := 1;
+            partial_amount := max_speed - i.speed_limit;
+            EXIT WHEN boolean_aux = 1;
+          END IF;
+          EXIT WHEN boolean_aux = 1;
+        END IF;
+      END LOOP;
+      EXIT WHEN boolean_aux = 1;
+    END LOOP;
+
+    total_amount := CEIL(partial_amount*amount_fine);
+
+    DBMS_OUTPUT.PUT_LINE(total_amount);
+    RETURN total_amount;
+
+END;
 
 -- Amount for a ‘safety distance’ radar sanction.
 
@@ -125,10 +195,10 @@ BEGIN
     LOOP
       date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
       date_aux_1 := i.odatetime;
-      FOR i IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
+      FOR j IN vehicle_2(vehicle_input_1,vehicle_input_2,road_input,km_point_input,direction_input)
       LOOP
-        date_2 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
-        date_aux_2 := i.odatetime;
+        date_2 := TO_CHAR(j.odatetime,'MM-DD-YY HH24.MI');
+        date_aux_2 := j.odatetime;
         time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM date_aux_1)) - TO_NUMBER(EXTRACT(SECOND FROM date_aux_2)));
         /*
           If the the day, month and year side by side with the hour and the minutes
@@ -148,7 +218,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
 
-END; /
+END;
 
 /*
 PRUEBAS:
@@ -169,11 +239,11 @@ Results expected:
 CREATE OR REPLACE FUNCTION obs_right_after_radar ()
 RETURN OBSERVATIONS%ROWTYPE AS obs_row_f1%ROWTYPE;
 BEGIN
-END; /
+END;
 
 -- Observation immediately prior to a given observation (of the same vehicle)
 
 CREATE OR REPLACE FUNCTION obs_right_after_vehicle ()
 RETURN OBSERVATIONS%ROWTYPE AS obs_row_f2%ROWTYPE;
 BEGIN
-END; /
+END;
