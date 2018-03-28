@@ -70,8 +70,8 @@ Results expected:
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
 
-CREATE OR REPLACE FUNCTION exceeding_section_speed (vehicle_input VARCHAR2, road_input_1 VARCHAR2,
- km_point_input_1 NUMBER, direction_input_1 VARCHAR2,road_input_2 VARCHAR2, km_point_input_2 NUMBER, direction_input_2 VARCHAR2)
+CREATE OR REPLACE FUNCTION exceeding_section_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
+ km_point_input_1 NUMBER, direction_input VARCHAR2, km_point_input_2 NUMBER)
 RETURN NUMBER
 IS
   date_1 VARCHAR2(28);
@@ -87,21 +87,21 @@ IS
 
   --Two radars are input as we want a section to be observed
   --Same car has been observed in two radars, likely in the same section
-  CURSOR vehicle_fined_radar_1 (vehicle_input VARCHAR2, road_input_1 VARCHAR2,
-   km_point_input_1 NUMBER, direction_input_1 VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction
+  CURSOR vehicle_fined_radar_1 (vehicle_input VARCHAR2, road_input VARCHAR2,
+   km_point_input_1 NUMBER, direction_input VARCHAR2) IS
+    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
     FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
-    WHERE nPlate = vehicle_input AND road = road_input_1 AND km_point = km_point_input_1
-      AND direction = direction_input_1;
+    WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_1
+      AND direction = direction_input;
 
-  CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input_2 VARCHAR2,
-   km_point_input_2 NUMBER, direction_input_2 VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction
+  CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input VARCHAR2,
+   km_point_input_2 NUMBER, direction_input VARCHAR2) IS
+    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
     FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
-    WHERE nPlate = vehicle_input AND road = road_input_2 AND km_point = km_point_input_2
-      AND direction = direction_input_2;
+    WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_2
+      AND direction = direction_input;
 
 BEGIN
 
@@ -112,28 +112,33 @@ BEGIN
       CLOSE vehicle_fined_radar_2;
     END IF;
 
-    FOR i IN vehicle_fined_radar_1(vehicle_input,road_input_1,km_point_input_1,direction_input_1)
+    FOR i IN vehicle_fined_radar_1(vehicle_input,road_input,km_point_input_1,direction_input)
     LOOP
       begin_section := i.km_point;
       date_1 := TO_CHAR(i.odatetime,'MM-DD-YY HH24.MI');
-      FOR j IN vehicle_fined_radar_1(vehicle_input,road_input_1,km_point_input_1,direction_input_1)
+      FOR j IN vehicle_fined_radar_1(vehicle_input,road_input,km_point_input_2,direction_input)
       LOOP
         end_section := j.km_point;
         date_2 := TO_CHAR(j.odatetime,'MM-DD-YY HH24.MI');
         section_km := ABS(begin_section-end_section);
-        --Section is delimited by 5 km or less, if any radar is set before that mark
+        section_km := LEAST(5,section_km);
+        --Section is delimited by 5 km or by any radar is set after/before that mark
         --If the observations has been made the same exact day varying only on the seconds
-        --And if the two radars delimite a section, then proceed to calculate the fine
-        IF section_km <= 5 AND date_1 = date_2 THEN
+        --And if the two radars delimite a section or just one, then proceed to calculate the fine
+        IF date_1 = date_2 THEN
           --Select the maximum speed of both radars
-          max_speed := GREATEST(i.speed,j.speed);
-          --Suposing that a section has one value of speed_limit
+          IF section_km > 5 OR section_km < 5 THEN
+            max_speed := GREATEST(i.speed,j.speed);
+          ELSE
+            --In the section there is only one radar
+            max_speed := i.speed;
+          END IF;
           IF max_speed > i.speed_limit THEN
             boolean_aux := 1;
             partial_amount := max_speed - i.speed_limit;
             EXIT WHEN boolean_aux = 1;
           END IF;
-          EXIT WHEN boolean_aux = 1;
+        EXIT WHEN boolean_aux = 1;
         END IF;
       END LOOP;
       EXIT WHEN boolean_aux = 1;
@@ -145,6 +150,20 @@ BEGIN
     RETURN total_amount;
 
 END;
+
+/*
+PRUEBAS:
+
+declare
+result number;
+begin
+result:=exceeding_max_speed('3422AEU','M50',15,'ASC');
+end;
+/
+
+Results expected:
+- 90€ ok
+*/
 
 -- Amount for a ‘safety distance’ radar sanction.
 
