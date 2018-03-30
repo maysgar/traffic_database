@@ -63,21 +63,21 @@ PRUEBAS:
 
 SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
 FROM OBSERVATIONS NATURAL JOIN RADARS
-where nPlate = '' and road = '' and km_point =  and direction = '';
+where nPlate = '' and road = '' and km_point =  and direction = '' and odatetime = TO_TIMESTAMP('','YYYY-MM-DD HH24.MI.SS.FF');
 
 declare
 result number;
 begin
-result:=exceeding_max_speed('3422AEU','M50',15,'ASC',TO_TIMESTAMP('21-JUL-09 09.47.40.780000 PM','DD-MON-YY HH.MI.SS.FF'));
-result:=exceeding_max_speed('9200IIA','M45',29,'DES',TO_TIMESTAMP('07-MAY-10 01.15.30.290000 AM','DD-MON-YY HH.MI.SS.FF'));
-result:=exceeding_max_speed('7919AEO','M50',75,'ASC',TO_TIMESTAMP('03-SEP-10 11.24.33.540000 PM','DD-MON-YY HH.MI.SS.FF'));
-result:=exceeding_max_speed('1479IUA','A6',171,'ASC',TO_TIMESTAMP('21-JUL-09 09.47.40.780000 PM','DD-MON-YY HH.MI.SS.FF'));
+result:=exceeding_max_speed('3422AEU','M50',15,'ASC',TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF'));
+result:=exceeding_max_speed('9200IIA','M45',29,'DES',TO_TIMESTAMP('2010-05-07 01.15.30.290000','YYYY-MM-DD HH24.MI.SS.FF'));
+result:=exceeding_max_speed('7919AEO','M50',75,'ASC',TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF'));
+result:=exceeding_max_speed('1479IUA','A6',171,'ASC',TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF'));
 end;
 /
 
 Results expected:
 - 100€ ok
-- 190€ ok ------
+- 650€ ok
 - 470€ ok
 - 0€ ok
 */
