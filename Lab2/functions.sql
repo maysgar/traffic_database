@@ -14,10 +14,12 @@ no a los carreteras. PREGUNTAR
 /*
   All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
   are involved and have to be given as an input
+
+  All observations are considered no matter the day they were made
 */
 
 CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
- km_point_input NUMBER, direction_input VARCHAR2)
+ km_point_input NUMBER, direction_input VARCHAR2, odatetime_input TIMESTAMP)
 RETURN NUMBER
 IS
   amount_fine INTEGER := 10;
@@ -25,14 +27,14 @@ IS
   total_amount NUMBER(4);
 
   CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
-   km_point_input NUMBER, direction_input VARCHAR2) IS
+   km_point_input NUMBER, direction_input VARCHAR2, odatetime_input TIMESTAMP) IS
     --SELECT nPlate, speed, road, speed_limit, km_point, direction
-    SELECT nPlate, speed, road, speedlim, km_point, direction
+    SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
     FROM OBSERVATIONS NATURAL JOIN RADARS
     --FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input
-      AND direction = direction_input;
+      AND direction = direction_input AND odatetime = odatetime_input;
 
 BEGIN
     IF vehicle_fined %ISOPEN THEN
@@ -42,10 +44,10 @@ BEGIN
     total_amount := 0;
     partial_amount := 0;
 
-    FOR i IN vehicle_fined(vehicle_input,road_input,km_point_input,direction_input)
+    FOR i IN vehicle_fined(vehicle_input,road_input,km_point_input,direction_input,odatetime_input)
     LOOP
       IF i.speed > i.speedlim THEN
-        partial_amount := i.speed - i.speedlim;
+        partial_amount := partial_amount + (i.speed - i.speedlim);
       END IF;
     END LOOP;
 
@@ -59,20 +61,24 @@ END;
 /*
 PRUEBAS:
 
+SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
+FROM OBSERVATIONS NATURAL JOIN RADARS
+where nPlate = '' and road = '' and km_point =  and direction = '';
+
 declare
 result number;
 begin
-result:=exceeding_max_speed('3422AEU','M50',15,'ASC');
-result:=exceeding_max_speed('9200IIA','M45',29,'DES');
-result:=exceeding_max_speed('7919AEO','M50',75,'ASC');
-result:=exceeding_max_speed('1479IUA','A6',171,'ASC');
+result:=exceeding_max_speed('3422AEU','M50',15,'ASC',TO_TIMESTAMP('21-JUL-09 09.47.40.780000 PM','DD-MON-YY HH.MI.SS.FF'));
+result:=exceeding_max_speed('9200IIA','M45',29,'DES',TO_TIMESTAMP('07-MAY-10 01.15.30.290000 AM','DD-MON-YY HH.MI.SS.FF'));
+result:=exceeding_max_speed('7919AEO','M50',75,'ASC',TO_TIMESTAMP('03-SEP-10 11.24.33.540000 PM','DD-MON-YY HH.MI.SS.FF'));
+result:=exceeding_max_speed('1479IUA','A6',171,'ASC',TO_TIMESTAMP('21-JUL-09 09.47.40.780000 PM','DD-MON-YY HH.MI.SS.FF'));
 end;
 /
 
 Results expected:
-- 90€ ok
-- 450€ ok
-- 270€ ok
+- 100€ ok
+- 190€ ok ------
+- 470€ ok
 - 0€ ok
 */
 
@@ -101,7 +107,7 @@ IS
     SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
     FROM OBSERVATIONS NATURAL JOIN RADARS
     --FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_1
       AND direction = direction_input;
 
@@ -111,7 +117,7 @@ IS
     SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
     FROM OBSERVATIONS NATURAL JOIN RADARS
     --FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_2
       AND direction = direction_input;
 
@@ -204,7 +210,7 @@ IS
     SELECT nPlate, speed, road, speedlim, km_point, direction
     FROM OBSERVATIONS NATURAL JOIN RADARS
     --FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input_1 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
@@ -214,7 +220,7 @@ IS
     SELECT nPlate, speed, road, speedlim, km_point, direction
     FROM OBSERVATIONS NATURAL JOIN RADARS
     --FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
