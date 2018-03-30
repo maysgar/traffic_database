@@ -4,8 +4,8 @@ set serveroutput on;
 *********************WARNING******************
 
 Cursores están hechos teniendo en mente que el
-speed limit está vinculado a las carreteras y
-no a los radares. PREGUNTAR
+speed limit está vinculado a las radares y
+no a los carreteras. PREGUNTAR
 
 **********************************************
 
@@ -26,10 +26,10 @@ IS
 
   CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction
-    --SELECT nPlate, speed, road, speedlim, km_point, direction
-    --FROM OBSERVATIONS NATURAL JOIN RADARS
-    FROM OBSERVATIONS a JOIN ROADS b
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction
+    SELECT nPlate, speed, road, speedlim, km_point, direction
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
@@ -44,8 +44,8 @@ BEGIN
 
     FOR i IN vehicle_fined(vehicle_input,road_input,km_point_input,direction_input)
     LOOP
-      IF i.speed > i.speed_limit THEN
-        partial_amount := i.speed - i.speed_limit;
+      IF i.speed > i.speedlim THEN
+        partial_amount := i.speed - i.speedlim;
       END IF;
     END LOOP;
 
@@ -97,20 +97,20 @@ IS
   --Same car has been observed in two radars, likely in the same section
   CURSOR vehicle_fined_radar_1 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_1 NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    --SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
-    --FROM OBSERVATIONS NATURAL JOIN RADARS
-    FROM OBSERVATIONS a JOIN ROADS b
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_1
       AND direction = direction_input;
 
   CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_2 NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    --SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
-    --FROM OBSERVATIONS NATURAL JOIN RADARS
-    FROM OBSERVATIONS a JOIN ROADS b
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_2
       AND direction = direction_input;
@@ -147,9 +147,9 @@ BEGIN
             --In the section there is only one radar
             max_speed := i.speed;
           END IF;
-          IF max_speed > i.speed_limit THEN
+          IF max_speed > i.speedlim THEN
             boolean_aux := 1;
-            partial_amount := max_speed - i.speed_limit;
+            partial_amount := max_speed - i.speedlim;
             EXIT WHEN boolean_aux = 1;
           END IF;
         EXIT WHEN boolean_aux = 1;
@@ -200,20 +200,20 @@ IS
 
   CURSOR vehicle_to_be_fined (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    --SELECT nPlate, speed, road, speedlim, km_point, direction
-    --FROM OBSERVATIONS NATURAL JOIN RADARS
-    FROM OBSERVATIONS a JOIN ROADS b
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    SELECT nPlate, speed, road, speedlim, km_point, direction
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input_1 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
   CURSOR vehicle_2 (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
-    SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    --SELECT nPlate, speed, road, speedlim, km_point, direction
-    --FROM OBSERVATIONS NATURAL JOIN RADARS
-    FROM OBSERVATIONS a JOIN ROADS b
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
+    SELECT nPlate, speed, road, speedlim, km_point, direction
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
     ON a.road = b.name
     WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
