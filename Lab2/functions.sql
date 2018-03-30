@@ -1,13 +1,20 @@
 set serveroutput on;
+/*
+
+*********************WARNING******************
+
+Cursores están hechos teniendo en mente que el
+speed limit está vinculado a las carreteras y
+no a los radares. PREGUNTAR
+
+**********************************************
+
+*/
 
 /*
   All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
   are involved and have to be given as an input
 */
-
--- Amount for a ‘exceeding maximum speed’ radar sanction.
---SPEED SANCTION IS 10€ PER km/h ABOVE THE SPEED LIMITED ROUNDED HIGH
---speed limit of the radar or the speed limit of the road?
 
 CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
  km_point_input NUMBER, direction_input VARCHAR2)
@@ -20,9 +27,10 @@ IS
   CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction
-    FROM OBSERVATIONS NATURAL JOIN RADARS
-    --FROM OBSERVATIONS a JOIN ROADS b
-    --ON a.road = b.name
+    --SELECT nPlate, speed, road, speedlim, km_point, direction
+    --FROM OBSERVATIONS NATURAL JOIN RADARS
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
@@ -47,8 +55,6 @@ BEGIN
     RETURN total_amount;
 
 END;
-
---Es cumulativo, por cada observacion realizada en dicho radar ???
 
 /*
 PRUEBAS:
@@ -92,18 +98,20 @@ IS
   CURSOR vehicle_fined_radar_1 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_1 NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS NATURAL JOIN RADARS
-    --FROM OBSERVATIONS a JOIN ROADS b
-    --ON a.road = b.name
+    --SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
+    --FROM OBSERVATIONS NATURAL JOIN RADARS
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_1
       AND direction = direction_input;
 
   CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_2 NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS NATURAL JOIN RADARS
-    --FROM OBSERVATIONS a JOIN ROADS b
-    --ON a.road = b.name
+    --SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
+    --FROM OBSERVATIONS NATURAL JOIN RADARS
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_2
       AND direction = direction_input;
 
@@ -193,18 +201,20 @@ IS
   CURSOR vehicle_to_be_fined (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS NATURAL JOIN RADARS
-    --FROM OBSERVATIONS a JOIN ROADS b
-    --ON a.road = b.name
+    --SELECT nPlate, speed, road, speedlim, km_point, direction
+    --FROM OBSERVATIONS NATURAL JOIN RADARS
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
     WHERE nPlate = vehicle_input_1 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
   CURSOR vehicle_2 (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS NATURAL JOIN RADARS
-    --FROM OBSERVATIONS a JOIN ROADS b
-    --ON a.road = b.name
+    --SELECT nPlate, speed, road, speedlim, km_point, direction
+    --FROM OBSERVATIONS NATURAL JOIN RADARS
+    FROM OBSERVATIONS a JOIN ROADS b
+    ON a.road = b.name
     WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
