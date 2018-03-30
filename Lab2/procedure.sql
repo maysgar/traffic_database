@@ -38,6 +38,7 @@ BEGIN
         INSERT INTO TICKETS VALUES(i.nPlate,i.odatetime,'','','',sysdate,sysdate+20,'',total_amount,i.owner,'R');
       END IF;
       total_amount := 0;
+      
     END LOOP;
 END daily_sanctions;
 /******************************************************************************/
@@ -46,3 +47,8 @@ Va a haber peleas porque deberemos de ir acumulando la cantidad en dinero
   de cada owner
 */
 /******************************************************************************/
+
+/*
+total_amount := exceeding_section_speed(i.nPlate,i.road,i.km_point,i.direction, km_point_input_2);
+total_amount := safety_distance(i.nPlate, vehicle_input_2, i.road, i.km_point, i.direction);
+*/
