@@ -20,8 +20,9 @@ IS
   CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction
-    FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
@@ -91,16 +92,18 @@ IS
   CURSOR vehicle_fined_radar_1 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_1 NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_1
       AND direction = direction_input;
 
   CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_2 NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_2
       AND direction = direction_input;
 
@@ -190,16 +193,18 @@ IS
   CURSOR vehicle_to_be_fined (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input_1 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
   CURSOR vehicle_2 (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
     SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
-    FROM OBSERVATIONS a JOIN ROADS b
-    ON a.road = b.name
+    FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
