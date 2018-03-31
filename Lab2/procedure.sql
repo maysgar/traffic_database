@@ -31,7 +31,7 @@ BEGIN
 
     FOR i IN fines
     LOOP
-      total_amount := exceeding_max_speed(i.nPlate,i.road,i.km_point,i.direction);
+      total_amount := exceeding_max_speed(i.nPlate,i.road,i.km_point,i.direction,i.odatetime);
       /*
         Segundo if para delimitar secciones y safety distance
       */
