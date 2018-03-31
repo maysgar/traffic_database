@@ -40,6 +40,7 @@ BEGIN
         total_amount := total_amount + exceeding_section_speed(i.nPlate,i.road,i.km_point,i.direction,j.km_point);
         total_amount := total_amount + safety_distance(i.nPlate,j.nPlate,i.road,i.km_point,i.direction);
       END LOOP;
+      --INSERT
       IF total_amount > 0 THEN
         --Revisar bien todos los campos
         INSERT INTO TICKETS VALUES(i.nPlate,i.odatetime,'','','',sysdate,sysdate+20,'',total_amount,i.owner,'R');

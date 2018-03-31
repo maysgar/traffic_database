@@ -5,7 +5,7 @@ set serveroutput on;
 
 Cursores están hechos teniendo en mente que el
 speed limit está vinculado a las radares y
-no a los carreteras. 
+no a los carreteras.
 
 **********************************************
 
@@ -21,7 +21,7 @@ CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_inp
 RETURN NUMBER
 IS
   amount_fine INTEGER := 10;
-  partial_amount NUMBER(4);
+  partial_amount INTEGER := 0;
   total_amount NUMBER(4);
 
   CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
@@ -40,7 +40,6 @@ BEGIN
     END IF;
 
     total_amount := 0;
-    partial_amount := 0;
 
     FOR i IN vehicle_fined(vehicle_input,road_input,km_point_input,direction_input,odatetime_input)
     LOOP
