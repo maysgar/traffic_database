@@ -5,7 +5,7 @@ set serveroutput on;
 
 Cursores están hechos teniendo en mente que el
 speed limit está vinculado a las radares y
-no a los carreteras. PREGUNTAR
+no a los carreteras. 
 
 **********************************************
 
@@ -14,8 +14,6 @@ no a los carreteras. PREGUNTAR
 /*
   All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
   are involved and have to be given as an input
-
-  All observations are considered no matter the day they were made
 */
 
 CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_input VARCHAR2,

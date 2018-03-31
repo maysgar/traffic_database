@@ -21,7 +21,7 @@ CREATE OR REPLACE PROCEDURE daily_sanctions IS
 
   CURSOR fines IS
     SELECT nPlate, owner, odatetime, speed, a.road, speedlim, a.Km_point, a.direction
-    FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction 
+    FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
     NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
 
 BEGIN
@@ -31,14 +31,20 @@ BEGIN
 
     FOR i IN fines
     LOOP
-      --calling function already created--
       total_amount := exceeding_max_speed(i.nPlate,i.road,i.km_point,i.direction);
+      /*
+        Segundo if para delimitar secciones y safety distance
+      */
+      FOR j IN fines
+      LOOP
+        total_amount := total_amount + exceeding_section_speed(i.nPlate,i.road,i.km_point,i.direction,j.km_point);
+        total_amount := total_amount + safety_distance(i.nPlate,j.nPlate,i.road,i.km_point,i.direction);
+      END LOOP;
       IF total_amount > 0 THEN
         --Revisar bien todos los campos
         INSERT INTO TICKETS VALUES(i.nPlate,i.odatetime,'','','',sysdate,sysdate+20,'',total_amount,i.owner,'R');
       END IF;
       total_amount := 0;
-      
     END LOOP;
 END daily_sanctions;
 /******************************************************************************/
