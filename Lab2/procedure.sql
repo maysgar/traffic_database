@@ -24,6 +24,11 @@ CREATE OR REPLACE PROCEDURE daily_sanctions IS
     FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
     NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
 
+  CURSOR aux IS
+    SELECT nPlate, owner, odatetime, speed, a.road, speedlim, a.Km_point, a.direction
+    FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
+    NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
+
 BEGIN
     IF fines %ISOPEN THEN
       CLOSE fines;
@@ -35,7 +40,7 @@ BEGIN
       /*
         Segundo if para delimitar secciones y safety distance
       */
-      FOR j IN fines
+      FOR j IN aux
       LOOP
         total_amount := total_amount + exceeding_section_speed(i.nPlate,i.road,i.km_point,i.direction,j.km_point);
         total_amount := total_amount + safety_distance(i.nPlate,j.nPlate,i.road,i.km_point,i.direction);
