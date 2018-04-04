@@ -1,17 +1,5 @@
 set serveroutput on;
 /*
-
-INPUTS, ESTÁN BIEN ?
-
-CURSORES DE LAS FUNCINOES DE SECTION Y safety_distance
-
-DOS ULTIMAS FUNCIONES, DEBEN DE RETURNEAR UNA FILA DE OBSERVATIONS?
-
-PROCEDURE DEBE LLAMAR A LAS FUNCIONES PERO TARDA DEMSIADO, CONSEJOS
-
-*/
-
-/*
   All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
   are involved and have to be given as an input
 */
@@ -51,17 +39,31 @@ END;
 /*
 PRUEBAS:
 
-SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
-FROM OBSERVATIONS NATURAL JOIN RADARS
-where nPlate = '' and road = '' and km_point =  and direction = '' and odatetime = TO_TIMESTAMP('','YYYY-MM-DD HH24.MI.SS.FF');
-
 declare
-result number;
+  a OBSERVATIONS%ROWTYPE;
+  result number;
 begin
-result:=exceeding_max_speed('3422AEU','M50',15,'ASC',TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF'));
-result:=exceeding_max_speed('9200IIA','M45',29,'DES',TO_TIMESTAMP('2010-05-07 01.15.30.290000','YYYY-MM-DD HH24.MI.SS.FF'));
-result:=exceeding_max_speed('7919AEO','M50',75,'ASC',TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF'));
-result:=exceeding_max_speed('1479IUA','A6',171,'ASC',TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF'));
+a.nPlate := '3422AEU';
+a.nPlate := '9200IIA';
+a.nPlate := '7919AEO';
+a.nPlate := '1479IUA';
+a.road := 'M50';
+a.road := 'M45';
+a.road := 'M50';
+a.road := 'A6';
+a.direction := 'ASC';
+a.direction := 'DES';
+a.direction := 'ASC';
+a.direction := 'ASC';
+a.km_point := 15;
+a.km_point := 29;
+a.km_point := 75;
+a.km_point := 171;
+a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+a.odatetime := TO_TIMESTAMP('2010-05-07 01.15.30.290000','YYYY-MM-DD HH24.MI.SS.FF');
+a.odatetime := TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF');
+a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+result := exceeding_max_speed(a);
 end;
 /
 
