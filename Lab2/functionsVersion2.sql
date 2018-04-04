@@ -1,36 +1,44 @@
 set serveroutput on;
+/*
+
+INPUTS, ESTÁN BIEN ?
+
+CURSORES DE LAS FUNCINOES DE SECTION Y safety_distance
+
+DOS ULTIMAS FUNCIONES, DEBEN DE RETURNEAR UNA FILA DE OBSERVATIONS?
+
+PROCEDURE DEBE LLAMAR A LAS FUNCIONES PERO TARDA DEMSIADO, CONSEJOS
+
+*/
 
 /*
   All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
   are involved and have to be given as an input
 */
 
-CREATE OR REPLACE FUNCTION exceeding_max_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
- km_point_input NUMBER, direction_input VARCHAR2, odatetime_input TIMESTAMP)
+CREATE OR REPLACE FUNCTION exceeding_max_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
   amount_fine INTEGER := 10;
   partial_amount INTEGER := 0;
-  total_amount NUMBER(4);
+  total_amount INTEGER := 0;
 
-  CURSOR vehicle_fined (vehicle_input VARCHAR2, road_input VARCHAR2,
-   km_point_input NUMBER, direction_input VARCHAR2, odatetime_input TIMESTAMP) IS
-    SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
+  CURSOR speedlimOfRadar IS
+    SELECT speedlim
     FROM OBSERVATIONS NATURAL JOIN RADARS
-    WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input
-      AND direction = direction_input AND odatetime = odatetime_input;
+    WHERE nPlate = obs.nPlate AND road = obs.road AND km_point = obs.km_point
+      AND direction = obs.direction AND odatetime = obs.odatetime;
 
 BEGIN
-    IF vehicle_fined %ISOPEN THEN
-      CLOSE vehicle_fined;
+
+    IF speedlimOfRadar %ISOPEN THEN
+      CLOSE speedlimOfRadar;
     END IF;
 
-    total_amount := 0;
-
-    FOR i IN vehicle_fined(vehicle_input,road_input,km_point_input,direction_input,odatetime_input)
+    FOR i IN speedlimOfRadar
     LOOP
-      IF i.speed > i.speedlim THEN
-        partial_amount := partial_amount + (i.speed - i.speedlim);
+      IF obs.speed > i.speedlim THEN
+        partial_amount := partial_amount + (obs.speed - i.speedlim);
       END IF;
     END LOOP;
 
@@ -38,7 +46,6 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
-
 END;
 
 /*
@@ -66,6 +73,7 @@ Results expected:
 */
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
+--La seccion se delimita en el input?
 CREATE OR REPLACE FUNCTION exceeding_section_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
  km_point_input_1 NUMBER, direction_input VARCHAR2, km_point_input_2 NUMBER)
 RETURN NUMBER
@@ -92,8 +100,11 @@ IS
 
   CURSOR vehicle_fined_radar_2 (vehicle_input VARCHAR2, road_input VARCHAR2,
    km_point_input_2 NUMBER, direction_input VARCHAR2) IS
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
     SELECT nPlate, speed, road, speedlim, km_point, direction, odatetime
     FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input AND road = road_input AND km_point = km_point_input_2
       AND direction = direction_input;
 
@@ -181,8 +192,11 @@ IS
 
   CURSOR vehicle_2 (vehicle_input_1 VARCHAR2, vehicle_input_2 VARCHAR2, road_input VARCHAR2,
    km_point_input NUMBER, direction_input VARCHAR2) IS
+    --SELECT nPlate, speed, road, speed_limit, km_point, direction, odatetime
     SELECT nPlate, speed, road, speedlim, km_point, direction
     FROM OBSERVATIONS NATURAL JOIN RADARS
+    --FROM OBSERVATIONS a JOIN ROADS b
+    --ON a.road = b.name
     WHERE nPlate = vehicle_input_2 AND road = road_input AND km_point = km_point_input
       AND direction = direction_input;
 
