@@ -11,7 +11,7 @@ IS
   partial_amount INTEGER := 0;
   total_amount INTEGER := 0;
 
-  CURSOR speedlimOfRadar IS
+  CURSOR speedlimOfRadar(obs OBSERVATIONS%ROWTYPE) IS
     SELECT speedlim
     FROM OBSERVATIONS NATURAL JOIN RADARS
     WHERE nPlate = obs.nPlate AND road = obs.road AND km_point = obs.km_point
@@ -23,7 +23,7 @@ BEGIN
       CLOSE speedlimOfRadar;
     END IF;
 
-    FOR i IN speedlimOfRadar
+    FOR i IN speedlimOfRadar(obs)
     LOOP
       IF obs.speed > i.speedlim THEN
         partial_amount := partial_amount + (obs.speed - i.speedlim);
@@ -43,29 +43,53 @@ declare
   a OBSERVATIONS%ROWTYPE;
   result number;
 begin
-a.nPlate := '3422AEU';
-a.nPlate := '9200IIA';
-a.nPlate := '7919AEO';
-a.nPlate := '1479IUA';
-a.road := 'M50';
-a.road := 'M45';
-a.road := 'M50';
-a.road := 'A6';
-a.direction := 'ASC';
-a.direction := 'DES';
-a.direction := 'ASC';
-a.direction := 'ASC';
-a.km_point := 15;
-a.km_point := 29;
-a.km_point := 75;
-a.km_point := 171;
-a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
-a.odatetime := TO_TIMESTAMP('2010-05-07 01.15.30.290000','YYYY-MM-DD HH24.MI.SS.FF');
-a.odatetime := TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF');
-a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
-result := exceeding_max_speed(a);
+  a.nPlate := '3422AEU';
+  a.speed := 110;
+  a.road := 'M50';
+  a.direction := 'ASC';
+  a.km_point := 15;
+  a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+  result := exceeding_max_speed(a);
 end;
-/
+
+declare
+  a OBSERVATIONS%ROWTYPE;
+  result number;
+begin
+  a.nPlate := '9200IIA';
+  a.speed := 145;
+  a.road := 'M45';
+  a.direction := 'DES';
+  a.km_point := 29;
+  a.odatetime := TO_TIMESTAMP('2010-05-07 01.15.30.290000','YYYY-MM-DD HH24.MI.SS.FF');
+  result := exceeding_max_speed(a);
+end;
+
+declare
+  a OBSERVATIONS%ROWTYPE;
+  result number;
+begin
+  a.nPlate := '7919AEO';
+  a.speed := 147;
+  a.road := 'M50';
+  a.direction := 'ASC';
+  a.km_point := 75;
+  a.odatetime := TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF');
+  result := exceeding_max_speed(a);
+end;
+
+declare
+  a OBSERVATIONS%ROWTYPE;
+  result number;
+begin
+  a.nPlate := '1479IUA';
+  a.speed := 280; --Any speed  in this especific case
+  a.road := 'A6';
+  a.direction := 'ASC';
+  a.km_point := 171;
+  a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+  result := exceeding_max_speed(a);
+end;
 
 Results expected:
 - 100€ ok
@@ -75,7 +99,6 @@ Results expected:
 */
 
 -- Amount for a ‘exceeding section speed’ radar sanction.
---La seccion se delimita en el input?
 CREATE OR REPLACE FUNCTION exceeding_section_speed (vehicle_input VARCHAR2, road_input VARCHAR2,
  km_point_input_1 NUMBER, direction_input VARCHAR2, km_point_input_2 NUMBER)
 RETURN NUMBER
