@@ -102,10 +102,6 @@ Results expected:
 CREATE OR REPLACE FUNCTION exceeding_section_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
-  amount_fine INTEGER := 10;
-  partial_amount INTEGER := 0;
-  total_amount INTEGER := 0;
-  obs2 OBSERVATIONS%ROWTYPE;
 BEGIN
 --Call of obs_right_after_vehicle
 END;
@@ -119,6 +115,7 @@ PRUEBAS:
 CREATE OR REPLACE FUNCTION safety_distance (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
+BEGIN
 --Call of obs_right_after_radar
 END;
 
@@ -224,7 +221,7 @@ declare
   result OBSERVATIONS%ROWTYPE;
 begin
   a.nPlate := '3422AEU';
-  a.odatetime := TO_TIMESTAMP('2012-01-14 13.09.00.360000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('2011-12-29 08.53.30.400000','YYYY-MM-DD HH24.MI.SS.FF');
   result:=obs_right_after_vehicle(a);
 end;
 
