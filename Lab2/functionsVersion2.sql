@@ -129,19 +129,20 @@ PRUEBAS:
 
 -- Observation immediately prior to a given observation (of the same radar)
 CREATE OR REPLACE FUNCTION obs_right_after_radar (obs OBSERVATIONS%ROWTYPE)
-RETURN OBSERVATIONS%ROWTYPE AS obs2 OBSERVATIONS%ROWTYPE
+RETURN OBSERVATIONS%ROWTYPE
 IS
   bool NUMBER := 0;
-  CURSOR vehicle_fined_radar (obs OBSERVATIONS%ROWTYPE) IS
-    SELECT odatetime
-    FROM OBSERVATIONS NATURAL JOIN RADARS
+  obs2 OBSERVATIONS%ROWTYPE;
+  CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
+    SELECT *
+    FROM OBSERVATIONS
     WHERE road = obs.road AND direction = obs.direction AND km_point = obs.km_point
     ORDER BY odatetime ASC;
 BEGIN
-    IF vehicle_fined_radar %ISOPEN THEN
-      CLOSE vehicle_fined_radar;
+    IF aux %ISOPEN THEN
+      CLOSE aux;
     END IF;
-    FOR i IN vehicle_fined_radar(obs)
+    FOR i IN aux(obs)
     LOOP
       IF obs.odatetime < i.odatetime THEN
         bool := 1;
@@ -153,8 +154,9 @@ BEGIN
         obs2.direction := i.direction;
         obs2.speed := i.speed;
       END IF;
-      DBMS_OUTPUT.PUT_LINE(bool);
+      EXIT WHEN bool = 1;
     END LOOP;
+    RETURN obs2;
 END;
 
 /*
@@ -162,21 +164,77 @@ PRUEBAS:
 
 declare
   a OBSERVATIONS%ROWTYPE;
-  result number;
+  result OBSERVATIONS%ROWTYPE;
 begin
-  a.road = 'M50';
-  a.km_point = 15;
-  a.direction = 'ASC';
-  a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.road := 'M50';
+  a.km_point := 15;
+  a.direction := 'ASC';
+  a.odatetime := TO_TIMESTAMP('2012-01-14 13.09.00.360000','YYYY-MM-DD HH24.MI.SS.FF');
   result:=obs_right_after_radar(a);
 end;
 
 Results expected:
+  SELECT odatetime
+  FROM OBSERVATIONS
+  WHERE road = 'M50' AND direction = 'ASC' AND km_point = '15'
+  ORDER BY odatetime ASC;
 
+  -Input: 14-JAN-12 13:09:00.36
+  -Next observation (same radar): 14-JAN-12 23:12:26.67
+  ok
 */
 
 -- Observation immediately prior to a given observation (of the same vehicle)
 CREATE OR REPLACE FUNCTION obs_right_after_vehicle (obs OBSERVATIONS%ROWTYPE)
-RETURN OBSERVATIONS%ROWTYPE AS obs2 OBSERVATIONS%ROWTYPE;
+RETURN OBSERVATIONS%ROWTYPE
+IS
+  obs2 OBSERVATIONS%ROWTYPE;
+  bool INTEGER := 0;
+  CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
+    SELECT *
+    FROM OBSERVATIONS
+    WHERE nPlate = obs.nPlate
+    ORDER BY odatetime ASC;
 BEGIN
+    IF aux %ISOPEN THEN
+      CLOSE aux;
+    END IF;
+    FOR i IN aux(obs)
+    LOOP
+      IF obs.odatetime < i.odatetime THEN
+        bool := 1;
+        --Set the immediate observation
+        obs2.nPlate := i.nPlate;
+        obs2.odatetime := i.odatetime;
+        obs2.road := i.road;
+        obs2.km_point := i.km_point;
+        obs2.direction := i.direction;
+        obs2.speed := i.speed;
+      END IF;
+      EXIT WHEN bool = 1;
+    END LOOP;
+    RETURN obs2;
 END;
+
+/*
+PRUEBAS:
+
+declare
+  a OBSERVATIONS%ROWTYPE;
+  result OBSERVATIONS%ROWTYPE;
+begin
+  a.nPlate := '3422AEU';
+  a.odatetime := TO_TIMESTAMP('2012-01-14 13.09.00.360000','YYYY-MM-DD HH24.MI.SS.FF');
+  result:=obs_right_after_vehicle(a);
+end;
+
+Results expected:
+  SELECT odatetime
+  FROM OBSERVATIONS
+  WHERE nPlate = '3422AEU'
+  ORDER BY odatetime ASC;
+
+  -Input: 29-DEC-11 08:53:30.40
+  -Next observation (same vehicle): 29-DEC-11 10:36:26.33
+  ok
+*/
