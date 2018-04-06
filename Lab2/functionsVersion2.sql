@@ -145,8 +145,10 @@ IS
   time_elapsed FLOAT := 0;
 BEGIN
     obs2 := obs_right_after_radar(obs);
-    time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
-    IF time_elapsed < 3.6 AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
+    time_elapsed := ABS(TO_NUMBER(obs.odatetime)-TO_NUMBER(obs2.odatetime));
+    --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
+    IF time_elapsed < 3.6
+    --IF time_elapsed < 3.6 AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
       partial_amount := 3.6-time_elapsed;
     END IF;
 
@@ -167,10 +169,9 @@ IS
   bool NUMBER := 0;
   obs2 OBSERVATIONS%ROWTYPE;
   CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
-    SELECT *
+    SELECT nPlate,odatetime,road,km_point,direction,speed,LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime
     FROM OBSERVATIONS
-    WHERE road = obs.road AND direction = obs.direction AND km_point = obs.km_point
-    ORDER BY odatetime ASC;
+    WHERE road = obs.road AND direction = obs.direction AND km_point = obs.km_point;
 BEGIN
     IF aux %ISOPEN THEN
       CLOSE aux;
