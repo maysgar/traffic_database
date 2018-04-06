@@ -220,7 +220,7 @@ IS
   obs2 OBSERVATIONS%ROWTYPE;
   bool INTEGER := 0;
   CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
-    SELECT *
+    SELECT odatetime,LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime, LAG(road) OVER (ORDER BY odatetime ASC) AS prior_road, LAG(direction) OVER (ORDER BY odatetime ASC) AS prior_direction, LAG(km_point) OVER (ORDER BY odatetime ASC) AS prior_km_point, LAG(speed) OVER (ORDER BY odatetime ASC) AS prior_speed
     FROM OBSERVATIONS
     WHERE nPlate = obs.nPlate
     ORDER BY odatetime ASC;
@@ -230,15 +230,15 @@ BEGIN
     END IF;
     FOR i IN aux(obs)
     LOOP
-      IF obs.odatetime < i.odatetime THEN
+      IF obs.odatetime = i.odatetime THEN
         bool := 1;
         --Set the immediate observation
         obs2.nPlate := i.nPlate;
-        obs2.odatetime := i.odatetime;
-        obs2.road := i.road;
-        obs2.km_point := i.km_point;
-        obs2.direction := i.direction;
-        obs2.speed := i.speed;
+        obs2.odatetime := i.prior_odatetime;
+        obs2.road := i.prior_road;
+        obs2.km_point := i.prior_km_point;
+        obs2.direction := i.prior_direction;
+        obs2.speed := i.prior_speed;
       END IF;
       EXIT WHEN bool = 1;
     END LOOP;
@@ -253,17 +253,17 @@ declare
   result OBSERVATIONS%ROWTYPE;
 begin
   a.nPlate := '3422AEU';
-  a.odatetime := TO_TIMESTAMP('2011-12-29 08.53.30.400000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('2011-12-29 10.36.26.330000','YYYY-MM-DD HH24.MI.SS.FF');
   result:=obs_right_after_vehicle(a);
 end;
 
 Results expected:
-  SELECT odatetime
+  SELECT odatetime,road,speed,direction,km_point
   FROM OBSERVATIONS
   WHERE nPlate = '3422AEU'
   ORDER BY odatetime ASC;
 
-  -Input: 29-DEC-11 08:53:30.40
-  -Prior observation (same vehicle): 29-DEC-11 10:36:26.33
+  -Input: 29-DEC-11 10:36:26.33, (), (), (), ()
+  -Prior observation (same vehicle): 29-DEC-11 08:53:30.40, , , , 
   ok
 */
