@@ -169,7 +169,7 @@ IS
   bool NUMBER := 0;
   obs2 OBSERVATIONS%ROWTYPE;
   CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
-    SELECT nPlate,odatetime,road,km_point,direction,speed,LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime
+    SELECT nPlate,odatetime,road,km_point,direction,speed,LAG(nPlate) OVER (ORDER BY odatetime ASC) AS prior_nPlate, LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime, LAG(speed) OVER (ORDER BY odatetime ASC) AS prior_speed
     FROM OBSERVATIONS
     WHERE road = obs.road AND direction = obs.direction AND km_point = obs.km_point;
 BEGIN
@@ -181,12 +181,12 @@ BEGIN
       IF obs.odatetime < i.odatetime THEN
         bool := 1;
         --Set the immediate observation
-        obs2.nPlate := i.nPlate;
-        obs2.odatetime := i.odatetime;
+        obs2.nPlate := i.prior_nPlate;
+        obs2.odatetime := i.prior_odatetime;
         obs2.road := i.road;
         obs2.km_point := i.km_point;
         obs2.direction := i.direction;
-        obs2.speed := i.speed;
+        obs2.speed := i.prior_speed;
       END IF;
       EXIT WHEN bool = 1;
     END LOOP;
@@ -214,7 +214,7 @@ Results expected:
   ORDER BY odatetime ASC;
 
   -Input: 14-JAN-12 13:09:00.36
-  -Next observation (same radar): 14-JAN-12 23:12:26.67
+  -Prior observation (same radar): 14-JAN-12 23:12:26.67
   ok
 */
 
@@ -269,6 +269,6 @@ Results expected:
   ORDER BY odatetime ASC;
 
   -Input: 29-DEC-11 08:53:30.40
-  -Next observation (same vehicle): 29-DEC-11 10:36:26.33
+  -Prior observation (same vehicle): 29-DEC-11 10:36:26.33
   ok
 */
