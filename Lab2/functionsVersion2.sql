@@ -163,24 +163,28 @@ END;
 
 /*
 PRUEBAS:
+Insert two new rows just see if the function is calcultaing good the fine amount:
 
-select n1,n2,d1,r1,k1 from(
-select nplate as n1,direction as d1,road as r1,km_point as k1 from observations
-union
-select nplate as n2,direction as d2,road as r2,km_point as k2 from observations
-)
-where n1 != n2 and r1 = r2 and d1 = d2 and k1 = k2;
+insert into observations values('1234XWE',TO_TIMESTAMP('1997-03-19 21.00.00.000000','YYYY-MM-DD HH24.MI.SS.FF'),'A1',76,'ASC',134);
+insert into observations values('4444ABC',TO_TIMESTAMP('1997-03-19 21.00.02.000000','YYYY-MM-DD HH24.MI.SS.FF'),'A1',76,'ASC',134);
+
+delete from observations where nplate = '1234XWE';
+delete from observations where nplate = '4444ABC';
+
+The two cars go with the same speed and both observations are done by the same radar
+and the second car is not respecting the safety distance, it should be fined with
+14€.
 
 declare
   a OBSERVATIONS%ROWTYPE;
   result number;
 begin
-  a.nPlate := '6525AEI';
-  a.speed := ;
-  a.road := '';
-  a.direction := '';
-  a.km_point := ;
-  a.odatetime := TO_TIMESTAMP('','YYYY-MM-DD HH24.MI.SS.FF');
+  a.nPlate := '4444ABC';
+  a.speed := 134;
+  a.road := 'A1';
+  a.direction := 'ASC';
+  a.km_point := 76;
+  a.odatetime := TO_TIMESTAMP('1997-03-19 21.00.02.000000','YYYY-MM-DD HH24.MI.SS.FF');
   result := safety_distance(a);
 end;
 */
