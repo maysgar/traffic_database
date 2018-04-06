@@ -149,11 +149,15 @@ IS
   time_elapsed FLOAT := 0;
 BEGIN
     obs2 := obs_right_after_radar(obs);
-    time_elapsed := ABS(TO_NUMBER(TO_CHAR(obs.odatetime))-TO_NUMBER(TO_CHAR(obs2.odatetime)));
-    --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
-    IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate THEN
-    --IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
-      partial_amount := 3.6-time_elapsed;
+    IF TO_CHAR(obs.odatetime,'YYYY-MM-DD HH24.MI') = TO_CHAR(obs2.odatetime,'YYYY-MM-DD HH24.MI') THEN
+      time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime))-TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
+      --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
+      IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate THEN
+      --IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
+        partial_amount := 3.6-time_elapsed;
+      END IF;
+    ELSE
+      partial_amount := 0;
     END IF;
 
     total_amount := CEIL(partial_amount*amount_fine);
