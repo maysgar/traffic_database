@@ -208,8 +208,8 @@ begin
 end;
 
 Results expected:
-  -Input: (6560AII),(119),14-JAN-12 23:12:26.67
-  -Prior observation (same radar): 2339OOI,113,14-JAN-12 13:09:00.36
+  -Input: (6560AII), (119km/h), 14-JAN-12 23:12:26.67
+  -Prior observation (same radar): 2339OOI, 113km/h, 14-JAN-12 13:09:00.36
   ok
 */
 
@@ -263,7 +263,7 @@ Results expected:
   WHERE nPlate = '3422AEU'
   ORDER BY odatetime ASC;
 
-  -Input: 29-DEC-11 10:36:26.33, (), (), (), ()
-  -Prior observation (same vehicle): 29-DEC-11 08:53:30.40, , , ,
+  -Input: 29-DEC-11 10:36:26.33, (A6), (99km/h), (DES), (60)
+  -Prior observation (same vehicle): 29-DEC-11 08:53:30.40, A6, 118km/h, DES, 198
   ok
 */
