@@ -149,8 +149,7 @@ IS
   time_elapsed FLOAT := 0;
 BEGIN
     obs2 := obs_right_after_radar(obs);
-      --CAMBIAR CONVERSION DE DATOS
-    time_elapsed := ABS(TO_NUMBER(obs.odatetime)-TO_NUMBER(obs2.odatetime));
+    time_elapsed := ABS(TO_NUMBER(TO_CHAR(obs.odatetime))-TO_NUMBER(TO_CHAR(obs2.odatetime)));
     --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
     IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate THEN
     --IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
