@@ -31,7 +31,6 @@ BEGIN
     END LOOP;
 
     total_amount := CEIL(partial_amount*amount_fine);
-
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
 END;
@@ -48,7 +47,7 @@ begin
   a.road := 'M50';
   a.direction := 'ASC';
   a.km_point := 15;
-  a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('21-JUL-09 21.47.40.780000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_max_speed(a);
 end;
 
@@ -61,7 +60,7 @@ begin
   a.road := 'M45';
   a.direction := 'DES';
   a.km_point := 29;
-  a.odatetime := TO_TIMESTAMP('2010-05-07 01.15.30.290000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('07-MAY-10 01.15.30.290000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_max_speed(a);
 end;
 
@@ -74,7 +73,7 @@ begin
   a.road := 'M50';
   a.direction := 'ASC';
   a.km_point := 75;
-  a.odatetime := TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('03-SEP-10 23.24.33.540000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_max_speed(a);
 end;
 
@@ -87,7 +86,7 @@ begin
   a.road := 'A6';
   a.direction := 'ASC';
   a.km_point := 171;
-  a.odatetime := TO_TIMESTAMP('2009-07-21 21.47.40.780000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('21-JUL-09 21.47.40.780000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_max_speed(a);
 end;
 
@@ -110,7 +109,7 @@ BEGIN
       --And if we the observations were made in the same road and direction...
       IF obs.road = obs2.road AND obs.direction = obs2.direction THEN
         --In the same day, month, year and hour...
-        IF TO_CHAR(obs.odatetime,'DD-MM-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MM-YY HH24')
+        IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24')
           IF obs.speed > obs.speedlim
         END IF;
       END IF;
@@ -133,7 +132,7 @@ begin
   a.road := '';
   a.direction := '';
   a.km_point := ;
-  a.odatetime := TO_TIMESTAMP('','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_section_speed(a);
 end;
 */
@@ -145,15 +144,13 @@ IS
   obs2 OBSERVATIONS%ROWTYPE;
   partial_amount FLOAT := 0;
   total_amount FLOAT := 0;
-  amount_fine FLOAT := 0;
+  amount_fine FLOAT := 10;
   time_elapsed FLOAT := 0;
 BEGIN
     obs2 := obs_right_after_radar(obs);
-    IF TO_CHAR(obs.odatetime,'YYYY-MM-DD HH24.MI') = TO_CHAR(obs2.odatetime,'YYYY-MM-DD HH24.MI') THEN
+    IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24.MI') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24.MI') THEN
       time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime))-TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
-      --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
       IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate THEN
-      --IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
         partial_amount := 3.6-time_elapsed;
       END IF;
     ELSE
@@ -182,7 +179,7 @@ delete from vehicles where nplate = '4444ABC';
 
 The two cars go with the same speed and both observations are done by the same radar
 and the second car is not respecting the safety distance, it should be fined with
-14€.
+16€. - ok
 
 declare
   a OBSERVATIONS%ROWTYPE;
@@ -193,7 +190,7 @@ begin
   a.road := 'A1';
   a.direction := 'ASC';
   a.km_point := 76;
-  a.odatetime := TO_TIMESTAMP('1997-03-19 21.00.02.000000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('19-MAR-10 09.00.02.000000','DD-MON-YY HH24.MI.SS.FF');
   result := safety_distance(a);
 end;
 */
@@ -226,6 +223,9 @@ BEGIN
       END IF;
       EXIT WHEN bool = 1;
     END LOOP;
+    DBMS_OUTPUT.PUT_LINE(obs2.nPlate);
+    DBMS_OUTPUT.PUT_LINE(obs2.odatetime);
+    DBMS_OUTPUT.PUT_LINE(obs2.speed);
     RETURN obs2;
 END;
 
@@ -239,7 +239,7 @@ begin
   a.road := 'M50';
   a.km_point := 15;
   a.direction := 'ASC';
-  a.odatetime := TO_TIMESTAMP('2012-01-14 23.12.26.670000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('14-JAN-12 23.12.26.670000','DD-MON-YY HH24.MI.SS.FF');
   result:=obs_right_after_radar(a);
 end;
 
@@ -278,6 +278,11 @@ BEGIN
       END IF;
       EXIT WHEN bool = 1;
     END LOOP;
+    DBMS_OUTPUT.PUT_LINE(obs2.road);
+    DBMS_OUTPUT.PUT_LINE(obs2.odatetime);
+    DBMS_OUTPUT.PUT_LINE(obs2.speed);
+    DBMS_OUTPUT.PUT_LINE(obs2.direction);
+    DBMS_OUTPUT.PUT_LINE(obs2.km_point);
     RETURN obs2;
 END;
 
@@ -289,7 +294,7 @@ declare
   result OBSERVATIONS%ROWTYPE;
 begin
   a.nPlate := '3422AEU';
-  a.odatetime := TO_TIMESTAMP('2011-12-29 10.36.26.330000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('29-DEC-11 10.36.26.330000','DD-MON-YY HH24.MI.SS.FF');
   result:=obs_right_after_vehicle(a);
 end;
 
