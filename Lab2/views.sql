@@ -46,14 +46,26 @@ ORDER BY month DESC;
 /* c) Stretches: table that records each road section in which the speed is lower
 than the general speed of the road (it contains the identification of the road,
 start and end points, and speed limit in the section). */
+
+--GABRIEL
+SELECT road, R1.km_point, speedlim, CASE difference
+        WHEN difference > 5 THEN 5
+        ELSE R2.km_point END
+        FROM(
+  SELECT R1.km_point,R2.km_point, R1.road, R1.direction, R2.road, R2.direction, ABS(R1.km_point-R2.km_point) AS difference
+  FROM RADARS R1, RADARS R2
+  WHERE R1.road = R2.road AND R1.direction = R2.direction
+);
+
+
+
+--ISMAEL
 CREATE OR REPLACE VIEW low_section AS
-SELECT road, Km_point, (Km_point + 5) AS next_Km_point, speedlim
-FROM(
-    SELECT name FROM ROADS AS A
+SELECT road, Km_point, (Km_point + 5) AS next_Km_point, speedlim, speed_limit
+FROM
+    (SELECT name FROM ROADS) A
     NATURAL JOIN
-    SELECT roads FROM RADARS AS B
-    ON A.name = B.roads
-)
+    (SELECT road FROM RADARS) B
 WHERE speedlim < speed_limit;
 
 
