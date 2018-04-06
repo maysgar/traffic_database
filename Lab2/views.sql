@@ -48,10 +48,10 @@ than the general speed of the road (it contains the identification of the road,
 start and end points, and speed limit in the section). */
 
 --GABRIEL
-SELECT CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN 5
-        ELSE 0 END AS end_point, R1.km_point AS start_point, R1.road, R1.speedlim
-  FROM RADARS R1, RADARS R2
-  WHERE R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point;
+SELECT CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN 5 --R1.km_point
+        ELSE 0 END AS end_point, R1.km_point AS start_point, R1.road, R1.speedlim --R2.km_point
+  FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
+  WHERE R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND speedlim < speed_limit ;
 
 
 --ISMAEL
