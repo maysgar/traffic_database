@@ -120,17 +120,21 @@ END;
 /*
 PRUEBAS:
 
+15-MAY-11 4.20.47.690000 - M30 - DES - 26
+15-MAY-11 4.15.23.450000 - M30 - DES - 30
+6525AEI
+
 declare
   a OBSERVATIONS%ROWTYPE;
   result number;
 begin
-  a.nPlate := '7919AEO';
-  a.speed := 147;
-  a.road := 'M50';
-  a.direction := 'ASC';
-  a.km_point := 75;
-  a.odatetime := TO_TIMESTAMP('2010-09-03 23.24.33.540000','YYYY-MM-DD HH24.MI.SS.FF');
-  result := exceeding_max_speed(a);
+  a.nPlate := '';
+  a.speed := ;
+  a.road := '';
+  a.direction := '';
+  a.km_point := ;
+  a.odatetime := TO_TIMESTAMP('','YYYY-MM-DD HH24.MI.SS.FF');
+  result := exceeding_section_speed(a);
 end;
 */
 
@@ -147,8 +151,8 @@ BEGIN
     obs2 := obs_right_after_radar(obs);
     time_elapsed := ABS(TO_NUMBER(obs.odatetime)-TO_NUMBER(obs2.odatetime));
     --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
-    IF time_elapsed < 3.6
-    --IF time_elapsed < 3.6 AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
+    IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate THEN
+    --IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate AND TO_CHAR(obs.odatetime,'MM-DD-YY HH24.MI') = TO_CHAR(obs2.odatetime,'MM-DD-YY HH24.MI') THEN
       partial_amount := 3.6-time_elapsed;
     END IF;
 
@@ -160,6 +164,25 @@ END;
 /*
 PRUEBAS:
 
+select n1,n2,d1,r1,k1 from(
+select nplate as n1,direction as d1,road as r1,km_point as k1 from observations
+union
+select nplate as n2,direction as d2,road as r2,km_point as k2 from observations
+)
+where n1 != n2 and r1 = r2 and d1 = d2 and k1 = k2;
+
+declare
+  a OBSERVATIONS%ROWTYPE;
+  result number;
+begin
+  a.nPlate := '6525AEI';
+  a.speed := ;
+  a.road := '';
+  a.direction := '';
+  a.km_point := ;
+  a.odatetime := TO_TIMESTAMP('','YYYY-MM-DD HH24.MI.SS.FF');
+  result := safety_distance(a);
+end;
 */
 
 -- Observation immediately prior to a given observation (of the same radar)
