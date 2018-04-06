@@ -149,6 +149,7 @@ IS
   time_elapsed FLOAT := 0;
 BEGIN
     obs2 := obs_right_after_radar(obs);
+      --CAMBIAR CONVERSION DE DATOS
     time_elapsed := ABS(TO_NUMBER(obs.odatetime)-TO_NUMBER(obs2.odatetime));
     --time_elapsed := ABS(TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
     IF time_elapsed < 3.6 AND obs.nPlate != obs2.nPlate THEN
@@ -165,8 +166,8 @@ END;
 PRUEBAS:
 Insert two new rows just see if the function is calcultaing good the fine amount:
 
-insert into vehicles values('1234XWE','abcasdasadasdbasd','sdf','asdf','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
-insert into vehicles values('4444ABC','abcasdasadaszbasd','sdf','asdf','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'93655750A','48906593Z');
+insert into vehicles values('1234XWE','abcasdasadasdbasd','Seta','Cardus','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
+insert into vehicles values('4444ABC','abcasdasadaszbasd','Seta','Champi','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'93655750A','48906593Z');
 
 insert into observations values('1234XWE',TO_TIMESTAMP('19-MAR-10 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
 insert into observations values('4444ABC',TO_TIMESTAMP('19-MAR-10 09.00.02.000000','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
