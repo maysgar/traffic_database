@@ -178,7 +178,7 @@ BEGIN
     END IF;
     FOR i IN aux(obs)
     LOOP
-      IF obs.odatetime < i.odatetime THEN
+      IF obs.odatetime = i.odatetime THEN
         bool := 1;
         --Set the immediate observation
         obs2.nPlate := i.prior_nPlate;
@@ -203,18 +203,13 @@ begin
   a.road := 'M50';
   a.km_point := 15;
   a.direction := 'ASC';
-  a.odatetime := TO_TIMESTAMP('2012-01-14 13.09.00.360000','YYYY-MM-DD HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('2012-01-14 23.12.26.670000','YYYY-MM-DD HH24.MI.SS.FF');
   result:=obs_right_after_radar(a);
 end;
 
 Results expected:
-  SELECT odatetime
-  FROM OBSERVATIONS
-  WHERE road = 'M50' AND direction = 'ASC' AND km_point = '15'
-  ORDER BY odatetime ASC;
-
-  -Input: 14-JAN-12 13:09:00.36
-  -Prior observation (same radar): 14-JAN-12 23:12:26.67
+  -Input: (6560AII),(119),14-JAN-12 23:12:26.67
+  -Prior observation (same radar): 2339OOI,113,14-JAN-12 13:09:00.36
   ok
 */
 
