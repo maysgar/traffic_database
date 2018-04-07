@@ -49,8 +49,19 @@ ON A.dni = B.dni
 WHERE A.dni IS NULL OR B.dni IS NULL
 );
 
+SELECT owner(
+SELECT owner FROM vehicles A
+FULL OUTER JOIN
+SELECT driver FROM assignments B
+ON A.nPlate = B.nPlate AND reg_driver = driver
+WHERE owner != reg_driver AND owner != driver
+GROUP BY owner
+);
+
 /*----------------------------QUERY D--------------------------*/
 /* Boss: owners of at least three cars they don’t drive. */
+
+
 
 --NICEEEEEE (10)
 
