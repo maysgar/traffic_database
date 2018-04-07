@@ -47,7 +47,7 @@ ORDER BY month DESC;
 than the general speed of the road (it contains the identification of the road,
 start and end points, and speed limit in the section). */
 --HECHA
-SELECT CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
+SELECT DISTINCT CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
         ELSE R2.km_point END AS end_point, R1.km_point AS start_point, R1.road, R1.speedlim
   FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
   WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit ;
