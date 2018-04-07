@@ -7,7 +7,7 @@ with the legal margin, to support the analysis of the convenience of this norm. 
 CREATE OR REPLACE VIEW sanction_low_speed AS
   SELECT nPlate,odatetime,difference FROM(
     SELECT nPlate,speed,odatetime,speed_limit/2-speed AS difference FROM
-    OBSERVATIONS NATURAL JOIN RADARS JOIN ROADS ON road = name
+    OBSERVATIONS JOIN ROADS ON road = name
     WHERE speed_limit/2 >= speed)
   WHERE difference > 0;
 
@@ -40,7 +40,7 @@ FROM(
     JOIN PERSONS dni = debtor NATURAL JOIN DRIVERS
     WHERE status = 'R' AND debtor = dni
 )
-GROUP BY debtro, reg_date
+GROUP BY debtor, reg_date
 ORDER BY month DESC;
 
 /* c) Stretches: table that records each road section in which the speed is lower
