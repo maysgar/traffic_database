@@ -34,7 +34,7 @@ FROM(
 SELECT name, speed_limit
 FROM ROADS
 ORDER BY name ASC)
-GROUP BY name
+GROUP BY name, speed_limit
 ORDER BY speed_limit DESC;
 
 /*----------------------------QUERY C--------------------------*/

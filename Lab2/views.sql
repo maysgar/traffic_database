@@ -46,16 +46,13 @@ ORDER BY month DESC;
 /* c) Stretches: table that records each road section in which the speed is lower
 than the general speed of the road (it contains the identification of the road,
 start and end points, and speed limit in the section). */
-CREATE OR REPLACE VIEW low_section AS
-SELECT road, Km_point, (Km_point + 5) AS next_Km_point, speedlim
-FROM(
-    SELECT name FROM ROADS AS A
-    NATURAL JOIN
-    SELECT roads FROM RADARS AS B
-    ON A.name = B.roads
-)
-WHERE speedlim < speed_limit;
-
+--HECHA
+--181 rows
+CREATE OR REPLACE VIEW Stretches AS
+SELECT DISTINCT R1.km_point AS start_point, CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
+        ELSE R2.km_point END AS end_point, R1.road, R1.speedlim
+  FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
+  WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit ;
 
 /* d) Quick-Witted Drivers: the ten drivers whose average speed is closest to those
 of the road without exceeding it. Tip: base the calculation on the percentage of
