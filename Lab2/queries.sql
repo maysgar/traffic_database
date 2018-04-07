@@ -41,6 +41,12 @@ ORDER BY speed_limit DESC;
 /* People who do not drive any of their vehicles (neither as a regular driver nor
 as an additional driver). */
 
+SELECT owner
+FROM VEHICLES
+WHERE reg_driver != owner;
+
+/* cosas de Gabo */
+/*
 SELECT name, surn_1 FROM(
 SELECT dni FROM drivers A
 FULL OUTER JOIN
@@ -48,15 +54,19 @@ SELECT dni FROM persons B
 ON A.dni = B.dni
 WHERE A.dni IS NULL OR B.dni IS NULL
 );
+*/
 
-SELECT owner(
+/* Prueba Isma assignments */
+/*
+SELECT owner FROM(
 SELECT owner FROM vehicles A
 FULL OUTER JOIN
 SELECT driver FROM assignments B
-ON A.nPlate = B.nPlate AND reg_driver = driver
+ON A.nPlate = B.nPlate
 WHERE owner != reg_driver AND owner != driver
 GROUP BY owner
 );
+*/
 
 /*----------------------------QUERY D--------------------------*/
 /* Boss: owners of at least three cars they don’t drive. */
@@ -98,10 +108,8 @@ ORDER BY v_owned DESC;
 last month and the same month of the previous year. */
 
 SELECT actual_income-last_income as diff_income FROM(
-SELECT EXTRACT(MONTH from pay_date) AS actual_month, EXTRACT(YEAR from pay_date) AS actual_year, COUNT(amount) as actual_income
-FROM tickets
-WHERE EXTRACT(MONTH from pay_date) = EXTRACT(MONTH FROM sysdate)
-AND EXTRACT(YEAR from pay_date) = EXTRACT(YEAR FROM sysdate)
-GROUP BY pay_date
-)
-WHERE actual_year = last_year-1 AND actual_month = last_month;
+SELECT COUNT(A.amount) as actual_income, COUNT(B.amount) as last_income
+FROM tickets A, tickets B
+WHERE EXTRACT(MONTH from A.pay_date) = EXTRACT(MONTH FROM sysdate) AND EXTRACT(MONTH from B.pay_date) = 2000
+AND EXTRACT(YEAR from A.pay_date) = EXTRACT(YEAR FROM sysdate) AND EXTRACT(YEAR from B.pay_date) = 2000-1
+);
