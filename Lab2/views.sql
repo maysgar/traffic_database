@@ -54,6 +54,15 @@ SELECT DISTINCT R1.km_point AS start_point, CASE WHEN ABS(R1.km_point-R2.km_poin
   FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
   WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit ;
 
+/*
+TESTS: we do a query where we also select the speed limit of the road in order to see the difference and make sure the result is correct
+
+SELECT DISTINCT R1.km_point AS start_point, CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
+ELSE R2.km_point END AS end_point, R1.road, R1.speedlim, speed_limit AS road_speed_limit
+FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
+WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit;
+*/
+
 /* d) Quick-Witted Drivers: the ten drivers whose average speed is closest to those
 of the road without exceeding it. Tip: base the calculation on the percentage of
 the maximum speed that each observation records. */
