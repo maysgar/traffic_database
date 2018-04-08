@@ -12,15 +12,14 @@ ORDER BY appearance DESC;
 /*
 Algo asi pa chequear que la query se hace
 
+SELECT * FROM(
 SELECT nPlate, COUNT(nPlate) AS appearance
-FROM(
-  SELECT nPlate FROM OBSERVATIONS AS a
-  NATURAL JOIN
-  SELECT nPlate FROM OBSERVATIONS AS b
-)
-WHERE ROWNUM = 10 AND a.odatetime = b.odatetime
+FROM OBSERVATIONS a, OBSERVATIONS b
+WHERE a.odatetime = b.odatetime
 GROUP BY nPlate
-ORDER BY appearance DESC;
+ORDER BY appearance DESC
+)
+WHERE ROWNUM <= 10;
 */
 
 /*----------------------------QUERY B--------------------------*/

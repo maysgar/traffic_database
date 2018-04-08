@@ -81,12 +81,12 @@ declare
   a OBSERVATIONS%ROWTYPE;
   result number;
 begin
-  a.nPlate := '1479IUA';
-  a.speed := 280; --Any speed  in this especific case
-  a.road := 'A6';
-  a.direction := 'ASC';
-  a.km_point := 171;
-  a.odatetime := TO_TIMESTAMP('21-JUL-09 21.47.40.780000','DD-MON-YY HH24.MI.SS.FF');
+  a.nPlate := '6648AEO';
+  a.speed := 51;
+  a.road := 'M45';
+  a.direction := 'DES';
+  a.km_point := 20;
+  a.odatetime := TO_TIMESTAMP('29-JUN-11 18.05.57.740000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_max_speed(a);
 end;
 
@@ -202,7 +202,7 @@ IS
   bool NUMBER := 0;
   obs2 OBSERVATIONS%ROWTYPE;
   CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
-    SELECT nPlate,odatetime,speed,LAG(nPlate) OVER (ORDER BY odatetime ASC) AS prior_nPlate, LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime, LAG(speed) OVER (ORDER BY odatetime ASC) AS prior_speed
+    SELECT odatetime,LAG(nPlate) OVER (ORDER BY odatetime ASC) AS prior_nPlate, LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime, LAG(speed) OVER (ORDER BY odatetime ASC) AS prior_speed
     FROM OBSERVATIONS
     WHERE road = obs.road AND direction = obs.direction AND km_point = obs.km_point;
 BEGIN
@@ -258,8 +258,7 @@ IS
   CURSOR aux (obs OBSERVATIONS%ROWTYPE) IS
     SELECT odatetime,LAG(odatetime) OVER (ORDER BY odatetime ASC) AS prior_odatetime, LAG(road) OVER (ORDER BY odatetime ASC) AS prior_road, LAG(direction) OVER (ORDER BY odatetime ASC) AS prior_direction, LAG(km_point) OVER (ORDER BY odatetime ASC) AS prior_km_point, LAG(speed) OVER (ORDER BY odatetime ASC) AS prior_speed
     FROM OBSERVATIONS
-    WHERE nPlate = obs.nPlate
-    ORDER BY odatetime ASC;
+    WHERE nPlate = obs.nPlate;
 BEGIN
     IF aux %ISOPEN THEN
       CLOSE aux;
