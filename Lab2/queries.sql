@@ -15,10 +15,10 @@ WHERE ROWNUM <= 10;
 Algo asi pa chequear que la query se hace
 
 SELECT * FROM(
-SELECT nPlate, COUNT(nPlate) AS appearance
+SELECT a.nPlate, COUNT(a.nPlate) AS appearance
 FROM OBSERVATIONS a, OBSERVATIONS b
 WHERE a.odatetime = b.odatetime
-GROUP BY nPlate
+GROUP BY a.nPlate
 ORDER BY appearance DESC
 )
 WHERE ROWNUM <= 10;
