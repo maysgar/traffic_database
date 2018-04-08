@@ -15,7 +15,7 @@ CREATE OR REPLACE VIEW sanction_low_speed AS
   Pruebas: --34 rows--
 
   SELECT nPlate,speed,road,speed_limit,difference FROM(
-    SELECT nPlate,speed,speed,road,speed_limit,speed_limit/2-speed AS difference FROM
+    SELECT nPlate,speed,road,speed_limit,speed_limit/2-speed AS difference FROM
     OBSERVATIONS NATURAL JOIN RADARS JOIN ROADS ON road = name
     WHERE speed_limit/2 >= speed)
   WHERE difference > 0;
