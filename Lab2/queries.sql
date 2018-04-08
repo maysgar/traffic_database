@@ -2,12 +2,14 @@
 /* The top 10 vehicles most 'observed' in the course of today. */
 
 --NICEEEEEE (0)
-
+SELECT * FROM(
 SELECT nPlate, COUNT(nPlate) AS appearance
 FROM OBSERVATIONS
-WHERE ROWNUM = 10 AND odatetime = sysdate
+WHERE odatetime = sysdate
 GROUP BY nPlate
-ORDER BY appearance DESC;
+ORDER BY appearance DESC
+)
+WHERE ROWNUM <= 10;
 
 /*
 Algo asi pa chequear que la query se hace
