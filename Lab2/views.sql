@@ -43,24 +43,11 @@ FROM(
 GROUP BY debtor, reg_date
 ORDER BY month DESC;
 
-
-CREATE OR REPLACE VIEW monthly_whinger AS
-SELECT debtor, EXTRACT(MONTH from reg_date) AS month, allegations
+SELECT debtor, EXTRACT(MONTH from reg_date) AS month, COUNT(reg_date) AS allegations
 FROM(
-  SELECT status, reg_date, COUNT(*) AS allegations FROM ALLEGATIONS NATURAL JOIN TICKETS
-  JOIN PERSONS dni = debtor NATURAL JOIN DRIVERS
-  WHERE status = 'R' AND debtor = dni;
-)
-GROUP BY debtor, reg_date
-ORDER BY month DESC;
-
-SELECT * FROM(
-SELECT debtor, EXTRACT(MONTH from reg_date) AS month, COUNT(*) AS allegations
-FROM(
-  SELECT debtor, reg_date, status
+  SELECT debtor, reg_date, status 
   FROM TICKETS NATURAL JOIN ALLEGATIONS
   WHERE status = 'R'
-)
 )
 GROUP BY debtor, month
 ORDER BY month DESC;
