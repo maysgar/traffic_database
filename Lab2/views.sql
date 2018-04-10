@@ -36,11 +36,33 @@ CREATE OR REPLACE VIEW sanction_low_speed AS
 CREATE OR REPLACE VIEW monthly_whinger AS
 SELECT debtor, EXTRACT(MONTH from reg_date) AS month, allegations
 FROM(
-    SELECT status, debtor, reg_date, COUNT(*) AS allegations FROM ALLEGATIONS NATURAL JOIN TICKETS
-    JOIN PERSONS dni = debtor NATURAL JOIN DRIVERS
-    WHERE status = 'R' AND debtor = dni
+  SELECT status, debtor, reg_date, COUNT(*) AS allegations FROM ALLEGATIONS NATURAL JOIN TICKETS
+  JOIN PERSONS dni = debtor NATURAL JOIN DRIVERS
+  WHERE status = 'R' AND debtor = dni;
 )
 GROUP BY debtor, reg_date
+ORDER BY month DESC;
+
+
+CREATE OR REPLACE VIEW monthly_whinger AS
+SELECT debtor, EXTRACT(MONTH from reg_date) AS month, allegations
+FROM(
+  SELECT status, reg_date, COUNT(*) AS allegations FROM ALLEGATIONS NATURAL JOIN TICKETS
+  JOIN PERSONS dni = debtor NATURAL JOIN DRIVERS
+  WHERE status = 'R' AND debtor = dni;
+)
+GROUP BY debtor, reg_date
+ORDER BY month DESC;
+
+SELECT * FROM(
+SELECT debtor, EXTRACT(MONTH from reg_date) AS month, COUNT(*) AS allegations
+FROM(
+  SELECT debtor, reg_date, status
+  FROM TICKETS NATURAL JOIN ALLEGATIONS
+  WHERE status = 'R'
+)
+)
+GROUP BY debtor, month
 ORDER BY month DESC;
 
 /* c) Stretches: table that records each road section in which the speed is lower
