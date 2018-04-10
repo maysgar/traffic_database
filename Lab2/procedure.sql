@@ -1,7 +1,6 @@
 --Daily sanctions
 --TODO: JOBS
 CREATE OR REPLACE PROCEDURE daily_sanctions IS
-
   total_amount INTEGER := 0;
   amount_speed INTEGER := 0;
   amount_section INTEGER := 0;
@@ -13,7 +12,6 @@ CREATE OR REPLACE PROCEDURE daily_sanctions IS
   OBSERVATIONS NATURAL JOIN VEHICLES
   JOIN PERSONS ON owner = DNI
   WHERE SYSDATE = CAST(odatetime AS DATE);
-
 BEGIN
     IF obs %ISOPEN THEN
       CLOSE obs;
@@ -31,7 +29,7 @@ BEGIN
       --amount_section := exceeding_max_section_speed(a);
       amount_safety := safety_distance(a);
       IF amount_speed > 0 OR amount_section > 0 OR amount_safety > 0 THEN
-        DBMS_OUTPUT.PUT_LINE('Daily sanction generated');
+        DBMS_OUTPUT.PUT_LINE('Daily sanction generated for today: ' || SYSDATE);
       END IF;
     END LOOP;
 END daily_sanctions;
