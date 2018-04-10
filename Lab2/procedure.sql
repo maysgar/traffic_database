@@ -18,49 +18,31 @@ and the penalty applied if the payment fulfilled later than due (the fine is dou
 CREATE OR REPLACE PROCEDURE daily_sanctions IS
 
   total_amount INTEGER := 0;
+  exceeding_max_speed_result INTEGER := 0;
+  exceeding_max_section_result INTEGER := 0;
+  safety_distance_result INTEGER := 0;
 
-  CURSOR fines IS
+  /*CURSOR fines IS
     SELECT nPlate, owner, odatetime, speed, a.road, speedlim, a.Km_point, a.direction
     FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
-    NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
+    NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;*/
 
-  CURSOR aux IS
-    SELECT nPlate, owner, odatetime, speed, a.road, speedlim, a.Km_point, a.direction
-    FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
-    NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
+    CURSOR obs IS
+    SELECT * FROM OBSERVATIONS WHERE SYSDATE = odatetime;
 
 BEGIN
     IF fines %ISOPEN THEN
       CLOSE fines;
     END IF;
 
-    FOR i IN fines
-    LOOP
-      total_amount := exceeding_max_speed(i.nPlate,i.road,i.km_point,i.direction,i.odatetime);
-      /*
-        Segundo if para delimitar secciones y safety distance
-      */
-      FOR j IN aux
-      LOOP
-        total_amount := total_amount + exceeding_section_speed(i.nPlate,i.road,i.km_point,i.direction,j.km_point);
-        total_amount := total_amount + safety_distance(i.nPlate,j.nPlate,i.road,i.km_point,i.direction);
-      END LOOP;
-      --INSERT
-      IF total_amount > 0 THEN
-        --Revisar bien todos los campos
-        INSERT INTO TICKETS VALUES(i.nPlate,i.odatetime,'','','',sysdate,sysdate+20,'',total_amount,i.owner,'R');
-      END IF;
-      total_amount := 0;
-    END LOOP;
-END daily_sanctions;
-/******************************************************************************/
-/*
-Va a haber peleas porque deberemos de ir acumulando la cantidad en dinero
-  de cada owner
-*/
-/******************************************************************************/
+    exceeding_max_speed_result := exceeding_max_speed();
+    exceeding_max_section_result := exceeding_max_section_speed();
+    safety_distance_result := safety_distance();
 
-/*
-total_amount := exceeding_section_speed(i.nPlate,i.road,i.km_point,i.direction, km_point_input_2);
-total_amount := safety_distance(i.nPlate, vehicle_input_2, i.road, i.km_point, i.direction);
-*/
+    FOR i IN obs 
+    LOOP
+      IF exceeding_max_speed_result, exceeding_max_section_result, safety_distance_result > 0 THEN
+
+      END IF;
+
+END daily_sanctions;
