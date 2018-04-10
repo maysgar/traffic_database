@@ -1,5 +1,8 @@
---a) Insert tickets 
-
+--a) Insert tickets
+CURSOR fines IS
+  SELECT nPlate, owner, odatetime, speed, a.road, speedlim, a.Km_point, a.direction
+  FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
+  NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
 
 
 /*
