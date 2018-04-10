@@ -33,6 +33,7 @@ BEGIN
       END IF;
     END LOOP;
 END daily_sanctions;
+/
 
 /*
 PRUEBAS:
@@ -57,5 +58,6 @@ DELETE FROM OBSERVATIONS WHERE nPlate = '3422AEU' AND odatetime = TO_TIMESTAMP('
 DELETE FROM OBSERVATIONS WHERE nPlate = '3422AEU' AND odatetime = TO_TIMESTAMP('17-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF');
 DELETE FROM OBSERVATIONS WHERE nPlate = '3422AEU' AND odatetime = TO_TIMESTAMP('18-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF');
 
+set serveroutput on;
 exec daily_sanctions;
 */
