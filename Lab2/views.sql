@@ -49,6 +49,23 @@ where status='R'
 group by debtor, extract(MONTH from reg_date)
 order by extract(MONTH from reg_date) DESC;
 
+
+/*
+Pruebas: 
+
+insert into allegations values('1234XWE',TO_TIMESTAMP('08-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'1234XWF','R',TO_TIMESTAMP('08-APR-18 09.00.00.000002','DD-MON-YY HH24.MI.SS.FF'));
+insert into allegations values('4444ABC',TO_TIMESTAMP('08-APR-17 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'4444ACC','R',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'));
+insert into allegations values();
+insert into allegations values();
+insert into allegations values();
+
+
+
+*/
+
+
+
+
 /* c) Stretches: table that records each road section in which the speed is lower
 than the general speed of the road (it contains the identification of the road,
 start and end points, and speed limit in the section). */
