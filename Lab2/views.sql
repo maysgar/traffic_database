@@ -43,14 +43,11 @@ FROM(
 GROUP BY debtor, reg_date
 ORDER BY month DESC;
 
-SELECT debtor, EXTRACT(MONTH from reg_date) AS month, COUNT(reg_date) AS allegations
-FROM(
-  SELECT debtor, reg_date, status 
-  FROM TICKETS NATURAL JOIN ALLEGATIONS
-  WHERE status = 'R'
-)
-GROUP BY debtor, month
-ORDER BY month DESC;
+select debtor, extract(MONTH from reg_date), COUNT(extract(MONTH from reg_date)) AS allegations
+from tickets natural join allegations
+where status='R'
+group by debtor, extract(MONTH from reg_date)
+order by extract(MONTH from reg_date) DESC;
 
 /* c) Stretches: table that records each road section in which the speed is lower
 than the general speed of the road (it contains the identification of the road,
