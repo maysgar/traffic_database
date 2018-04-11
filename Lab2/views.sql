@@ -51,13 +51,25 @@ order by extract(MONTH from reg_date) DESC;
 
 
 /*
-Pruebas: 
+Pruebas:
+
+insert into vehicles values('1234XWE','abcasdasadasdbasd','Seta','Cardus','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
+insert into vehicles values('1234XWF','abcasdasadasdbase','Seta','Cardus','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
+insert into vehicles values('4444ABC','abcasdasadasdbasf','Seta','Cardus','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
+insert into vehicles values('4444ACC','abcasdasadasdbasg','Seta','Cardus','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
+
+insert into observations values('1234XWE',TO_TIMESTAMP('08-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
+insert into observations values('1234XWF',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
+insert into observations values('4444ABC',TO_TIMESTAMP('08-APR-17 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
+insert into observations values('4444ACC',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
+
+insert into tickets values('1234XWE',TO_TIMESTAMP('08-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D','1234XWF',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),to_date('08-APR-18','DD-MON-YY'),to_date('28-APR-18','DD-MON-YY'),'C','2000','64997574B','F');
+insert into tickets values('4444ABC',TO_TIMESTAMP('08-APR-17 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D','4444ACC',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),to_date('08-APR-17','DD-MON-YY'),to_date('28-APR-17','DD-MON-YY'),'C','1000','83880461J','F');
 
 insert into allegations values('1234XWE',TO_TIMESTAMP('08-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'1234XWF','R',TO_TIMESTAMP('08-APR-18 09.00.00.000002','DD-MON-YY HH24.MI.SS.FF'));
 insert into allegations values('4444ABC',TO_TIMESTAMP('08-APR-17 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'4444ACC','R',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'));
-insert into allegations values();
-insert into allegations values();
-insert into allegations values();
+insert into allegations values('1234XWF',TO_TIMESTAMP('08-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'1234XWF','R',TO_TIMESTAMP('08-APR-18 09.00.00.000002','DD-MON-YY HH24.MI.SS.FF'));
+insert into allegations values('4444ACC',TO_TIMESTAMP('08-APR-17 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'4444ACC','R',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'));
 
 
 

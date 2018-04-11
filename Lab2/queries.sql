@@ -139,6 +139,19 @@ insert into observations values('4444ACC',TO_TIMESTAMP('08-APR-17 09.00.00.00000
 insert into tickets values('1234XWE',TO_TIMESTAMP('08-APR-18 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D','1234XWF',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),to_date('08-APR-18','DD-MON-YY'),to_date('28-APR-18','DD-MON-YY'),'C','2000','64997574B','F');
 insert into tickets values('4444ABC',TO_TIMESTAMP('08-APR-17 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'D','4444ACC',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),to_date('08-APR-17','DD-MON-YY'),to_date('28-APR-17','DD-MON-YY'),'C','1000','83880461J','F');
 
+--deletes *******************************************
+
 delete from tickets where obs1_veh = '1234XWE';
 delete from tickets where obs1_veh = '4444ABC';
+
+delete from observations values('1234XWE');
+delete from observations values('1234XWF');
+delete from observations values('4444ABC');
+delete from observations values('4444ACC');
+
+delete from vehicles values('1234XWE');
+delete from vehicles values('1234XWF');
+delete from vehicles values('4444ABC');
+delete from vehicles values('4444ACC');
+
 */
