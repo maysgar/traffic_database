@@ -74,7 +74,10 @@ insert into allegations values('4444ABC',TO_TIMESTAMP('08-APR-17 09.00.00.000000
 insert into allegations values('1234XWF',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-18 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'48906593Z','R',TO_TIMESTAMP('08-APR-18 09.00.00.000002','DD-MON-YY HH24.MI.SS.FF'));
 insert into allegations values('4444ACC',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'D',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'),'48906593Z','R',TO_TIMESTAMP('08-APR-17 09.00.00.000001','DD-MON-YY HH24.MI.SS.FF'));
 
-
+delete from allegations values('1234XWE');
+delete from allegations values('4444ABC');
+delete from allegations values('1234XWF');
+delete from allegations values('4444ACC');
 
 */
 
