@@ -43,11 +43,12 @@ FROM(
 GROUP BY debtor, reg_date
 ORDER BY month DESC;
 
-select debtor, extract(MONTH from reg_date), COUNT(extract(MONTH from reg_date)) AS allegations
+select debtor, extract(YEAR from reg_date), extract(MONTH from reg_date), COUNT(extract(MONTH from reg_date)) AS allegations
 from tickets natural join allegations
 where status='R'
-group by debtor, extract(MONTH from reg_date)
-order by extract(MONTH from reg_date) DESC;
+group by debtor, extract(YEAR from reg_date), extract(MONTH from reg_date)
+order by extract(YEAR from reg_date) DESC, extract(MONTH from reg_date) DESC;
+
 
 
 /*
