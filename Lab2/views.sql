@@ -49,6 +49,16 @@ where status='R'
 group by debtor, extract(YEAR from reg_date), extract(MONTH from reg_date)
 order by extract(YEAR from reg_date) DESC, extract(MONTH from reg_date) DESC;
 
+/*
+MIERDAS PARA INTENTAR CONSEGUIR SOLO EL MAX NUMBER OF DRIVERS FOR EACH MONTH
+
+select COUNT(obs_veh), extract(YEAR from A.reg_date), extract(MONTH from A.reg_date), extract(YEAR from B.reg_date), extract(MONTH from B.reg_date)
+from tickets A, tickets B
+where a.year = b.year AND a.month = b.month AND status='R'
+GROUP BY extract(YEAR from A.reg_date), extract(MONTH from A.reg_date)
+ORDER BY extract(YEAR from reg_date) DESC, extract(MONTH from reg_date) DESC;
+*/
+
 
 
 /*
