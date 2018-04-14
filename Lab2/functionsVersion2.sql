@@ -97,7 +97,6 @@ Results expected:
 - 0€ ok
 */
 
--- Amount for a ‘exceeding section speed’ radar sanction.
 CREATE OR REPLACE FUNCTION exceeding_section_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
@@ -114,12 +113,12 @@ BEGIN
         IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24') THEN
         --If the two observations correspond to the same car
           IF  obs.nPlate = obs2.nPlate THEN
-            time_diff := ABS(TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime)))*3600;
-            IF ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime))) THEN
-              time_diff := time_diff + ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
+            time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime)))*3600;
+            IF TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) THEN
+              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
             END IF;
-            IF ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime))) THEN
-              time_diff := time_diff + ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime))) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)));
+            IF TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) THEN
+              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)));
             END IF;
 
           total_amount := (((obs2.km_point - obs.km_point)*3600/(time_diff)) - speed_lim)*10;
@@ -131,6 +130,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
 END;
+/
 
 /*
 PRUEBAS:
