@@ -102,6 +102,8 @@ CREATE OR REPLACE FUNCTION exceeding_section_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
   obs2 OBSERVATIONS%ROWTYPE;
+  time_diff FLOAT := 0;
+  total_amount FLOAT := 0;
 BEGIN
     obs2 := obs_right_after_vehicle(obs);
     --If we are guaranteed to be on a section...
@@ -109,11 +111,25 @@ BEGIN
       --And if we the observations were made in the same road and direction...
       IF obs.road = obs2.road AND obs.direction = obs2.direction THEN
         --In the same day, month, year and hour...
-        IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24')
-          IF obs.speed > obs.speedlim
+        IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24') THEN
+        --If the two observations correspond to the same car
+          IF  obs.nPlate = obs2.nPlate THEN
+            time_diff := ABS(TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime)))*3600;
+            IF ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime))) THEN
+              time_diff := time_diff + ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
+            END IF;
+            IF ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime))) THEN
+              time_diff := time_diff + ABS(TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime))) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)));
+            END IF;
+
+          total_amount := (((obs2.km_point - obs.km_point)*3600/(time_diff)) - speed_lim)*10;
+          END IF;
         END IF;
       END IF;
     END IF;
+
+    DBMS_OUTPUT.PUT_LINE(total_amount);
+    RETURN total_amount;
 END;
 
 /*
