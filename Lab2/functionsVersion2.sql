@@ -103,6 +103,7 @@ IS
   obs2 OBSERVATIONS%ROWTYPE;
   time_diff FLOAT := 0;
   total_amount FLOAT := 0;
+  --road_speed := SELECT speed_limit FROM roads WHERE name = obs.road;
 BEGIN
     obs2 := obs_right_after_vehicle(obs);
     --If we are guaranteed to be on a section...
@@ -121,7 +122,7 @@ BEGIN
               time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)));
             END IF;
 
-          total_amount := (((obs2.km_point - obs.km_point)*3600/(time_diff)) - speed_lim)*10;
+          total_amount := ((((obs2.km_point - obs.km_point)*3600)/time_diff) - (SELECT speed_limit FROM roads WHERE name = obs.road))*10;
           END IF;
         END IF;
       END IF;
