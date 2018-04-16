@@ -140,6 +140,10 @@ BEGIN
 END;
 /
 
+insert into observations values('1405AOU',TO_TIMESTAMP('2010-MAR-06 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',261,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('2010-MAR-06 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',264,'ASC',160);
+
+
 
 /*
 PRUEBAS:
@@ -193,6 +197,7 @@ Insert two new rows just see if the function is calcultaing good the fine amount
 
 insert into vehicles values('1234XWE','abcasdasadasdbasd','Seta','Cardus','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'65871451A','48906593Z');
 insert into vehicles values('4444ABC','abcasdasadaszbasd','Seta','Champi','black',to_date('10-JUL-97','DD-MON-YY'),to_date('10-JUL-97','DD-MON-YY'),'93655750A','48906593Z');
+
 
 insert into observations values('1234XWE',TO_TIMESTAMP('19-MAR-10 09.00.00.000000','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
 insert into observations values('4444ABC',TO_TIMESTAMP('19-MAR-10 09.00.02.000000','DD-MON-YY HH24.MI.SS.FF'),'A1',76,'ASC',134);
