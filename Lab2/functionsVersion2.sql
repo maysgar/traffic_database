@@ -118,24 +118,20 @@ BEGIN
 
 	  */
 	  --Primer if revisar
-    IF obs.km_point < obs2.km_point THEN
       --And if we the observations were made in the same road and direction...
-      IF obs.road = obs2.road AND obs.direction = obs2.direction THEN
+      IF obs.road = obs2.road AND obs.direction = obs2.direction AND obs2.km_point < obs.km_point AND obs.nPlate = obs2.nPlate THEN
         --In the same day, month, year and hour...
         IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24') THEN
         --If the two observations correspond to the same car
-          IF  obs.nPlate = obs2.nPlate THEN
-            time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime)))*3600;
-            IF TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) THEN
-              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
+            time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime)))*3600;
+            IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
+              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
             END IF;
-            IF TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) THEN
-              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)));
+            IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
+              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
             END IF;
 
-          total_amount := ((((obs2.km_point - obs.km_point)*3600)/time_diff) - road_speed_limit)*10;
-          END IF;
-        END IF;
+          total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - road_speed_limit)*10;
       END IF;
     END IF;
 
@@ -143,6 +139,7 @@ BEGIN
     RETURN total_amount;
 END;
 /
+
 
 /*
 PRUEBAS:
