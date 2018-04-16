@@ -140,9 +140,8 @@ BEGIN
 END;
 /
 
-insert into observations values('1405AOU',TO_TIMESTAMP('06-MAR-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',261,'ASC',160);
-insert into observations values('1405AOU',TO_TIMESTAMP('06-MAR-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',264,'ASC',160);
-
+insert into observations values('1405AOU',TO_TIMESTAMP('06-MAR-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',10,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('06-MAR-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',13,'ASC',160);
 /*
 PRUEBAS:
 
