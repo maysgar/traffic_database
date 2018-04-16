@@ -109,6 +109,15 @@ IS
 BEGIN
     obs2 := obs_right_after_vehicle(obs);
     --If we are guaranteed to be on a section...
+    --Section is delimited by 5 km or less, to know this:
+	  /*
+		  SELECT DISTINCT R1.km_point AS start_point, CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
+          ELSE R2.km_point END AS end_point
+		  FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
+		  WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit ;
+
+	  */
+	  --Primer if revisar
     IF obs.km_point < obs2.km_point THEN
       --And if we the observations were made in the same road and direction...
       IF obs.road = obs2.road AND obs.direction = obs2.direction THEN
