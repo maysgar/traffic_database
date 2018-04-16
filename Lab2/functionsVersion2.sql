@@ -103,6 +103,8 @@ IS
   obs2 OBSERVATIONS%ROWTYPE;
   time_diff FLOAT := 0;
   total_amount FLOAT := 0;
+  road_speed_limit INTEGER := 0;
+  CURSOR speed_road(obs OBSERVATIONS%ROWTYPE) IS
   SELECT speed_limit INTO road_speed_limit FROM roads WHERE name = obs.road;
 BEGIN
     obs2 := obs_right_after_vehicle(obs);
