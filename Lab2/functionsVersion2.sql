@@ -104,9 +104,11 @@ IS
   time_diff FLOAT := 0;
   total_amount FLOAT := 0;
   road_speed_limit INTEGER := 0;
+  radar_speed_limit INTEGER := 0;
 BEGIN
     obs2 := obs_right_after_vehicle(obs);
 	  SELECT speed_limit INTO road_speed_limit FROM roads WHERE name = obs.road;
+	  SELECT speedlim INTO radar_speed_limit FROM radars where RADARS.road = obs2.road AND RADARS.Km_point = obs2.km_point AND RADARS.direction = obs2.direction;
 
       --And if we the observations were made in the same road and direction...
       IF obs.road = obs2.road AND obs.direction = obs2.direction AND obs2.km_point < obs.km_point AND obs.nPlate = obs2.nPlate THEN
@@ -123,10 +125,10 @@ BEGIN
 
             --If the section is not delimited by 2 radars
             IF (obs.km_point - obs2.km_point) > 5 THEN
-              total_amount := ((((5*3600)/time_diff) - obs2.speedlim)*10) + ((((((obs.km_point - obs2.km_point) - 5)*3600)/time_diff) - road_speed_limit)*10);
+              total_amount := ((((5*3600)/time_diff) - radar_speed_limit)*10) + ((((((obs.km_point - obs2.km_point) - 5)*3600)/time_diff) - road_speed_limit)*10);
             ELSE 
               --If the section is delimited by 2 radars
-              total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - obs2.speedlim)*10;
+              total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - radar_speed_limit)*10;
               DBMS_OUTPUT.PUT_LINE('Time difference: ' || time_diff);
               DBMS_OUTPUT.PUT_LINE('Road speed limit: ' || road_speed_limit);
               DBMS_OUTPUT.PUT_LINE('Section kms: ' || (obs.km_point - obs2.km_point));
