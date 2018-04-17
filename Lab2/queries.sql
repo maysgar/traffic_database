@@ -42,9 +42,13 @@ ORDER BY speed_limit DESC;
 /* People who do not drive any of their vehicles (neither as a regular driver nor
 as an additional driver). */
 
-SELECT owner
-FROM VEHICLES
-WHERE reg_driver != owner;
+SELECT owner FROM(
+(SELECT owner, nPlate, reg_driver FROM vehicles) A 
+JOIN 
+(SELECT driver, nPlate FROM assignments) B
+ON A.nPlate = B.nPlate) 
+WHERE A.owner != A.reg_driver AND A.owner != B.driver 
+GROUP BY owner;
 
 /* cosas de Gabo */
 /*
@@ -54,18 +58,6 @@ FULL OUTER JOIN
 SELECT dni FROM persons B
 ON A.dni = B.dni
 WHERE A.dni IS NULL OR B.dni IS NULL
-);
-*/
-
-/* Prueba Isma assignments */
-/*
-SELECT owner FROM(
-SELECT owner FROM vehicles A
-JOIN
-SELECT driver FROM assignments B
-ON A.nPlate = B.nPlate
-WHERE A.owner != A.reg_driver AND A.owner != B.driver
-GROUP BY owner
 );
 */
 
