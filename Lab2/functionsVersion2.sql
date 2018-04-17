@@ -104,26 +104,19 @@ IS
   time_diff FLOAT := 0;
   total_amount FLOAT := 0;
   road_speed_limit INTEGER := 0;
-  CURSOR speed_road(obs OBSERVATIONS%ROWTYPE) IS
-  SELECT speed_limit INTO road_speed_limit FROM roads WHERE name = obs.road;
 BEGIN
     obs2 := obs_right_after_vehicle(obs);
-    --If we are guaranteed to be on a section...
-    --Section is delimited by 5 km or less, to know this:
-	  /*
-		  SELECT DISTINCT R1.km_point AS start_point, CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
-          ELSE R2.km_point END AS end_point
-		  FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
-		  WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit ;
+	IF (obs.km_point - obs2.km_point) > 5 THEN
+	RAISE_APPLICATION_ERROR(-20001, 'The section is not delimited by 2 radars so there is not a second observation');
+	ELSE 
+	SELECT speed_limit INTO road_speed_limit FROM roads WHERE name = obs.road;
 
-	  */
-	  --Primer if revisar
       --And if we the observations were made in the same road and direction...
       IF obs.road = obs2.road AND obs.direction = obs2.direction AND obs2.km_point < obs.km_point AND obs.nPlate = obs2.nPlate THEN
         --In the same day, month, year and hour...
         IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24') THEN
         --If the two observations correspond to the same car
-            time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime)))*3600;
+            time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime)))*60;
             IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
               time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
             END IF;
@@ -132,36 +125,39 @@ BEGIN
             END IF;
 
           total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - road_speed_limit)*10;
-      END IF;
-    END IF;
+		  DBMS_OUTPUT.PUT_LINE('Time difference: ' || time_diff);
+		  DBMS_OUTPUT.PUT_LINE('Road speed limit: ' || road_speed_limit);
+		  DBMS_OUTPUT.PUT_LINE('Section kms: ' || (obs.km_point - obs2.km_point));
+        END IF;
+	  END IF;
+	END IF;
 
-    DBMS_OUTPUT.PUT_LINE(total_amount);
+    DBMS_OUTPUT.PUT_LINE('Amount: ' || total_amount);
     RETURN total_amount;
 END;
 /
 
-insert into observations values('1405AOU',TO_TIMESTAMP('06-MAR-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',10,'ASC',160);
-insert into observations values('1405AOU',TO_TIMESTAMP('06-MAR-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',13,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('06-FEB-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',10,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('06-FEB-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',13,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('06-FEB-10 02.18.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',45,'ASC',160);
+
 /*
 PRUEBAS:
-
-15-MAY-11 4.20.47.690000 - M30 - DES - 26
-15-MAY-11 4.15.23.450000 - M30 - DES - 30
-6525AEI
 
 declare
   a OBSERVATIONS%ROWTYPE;
   result number;
 begin
-  a.nPlate := '';
-  a.speed := ;
-  a.road := '';
-  a.direction := '';
-  a.km_point := ;
-  a.odatetime := TO_TIMESTAMP('','DD-MON-YY HH24.MI.SS.FF');
+  a.nPlate := '1405AOU';
+  a.speed := 160;
+  a.road := 'A2';
+  a.direction := 'ASC';
+  a.km_point := 45;
+  a.odatetime := TO_TIMESTAMP('06-FEB-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_section_speed(a);
 end;
 */
+
 
 -- Amount for a ‘safety distance’ radar sanction.
 CREATE OR REPLACE FUNCTION safety_distance (obs OBSERVATIONS%ROWTYPE)
@@ -219,6 +215,7 @@ begin
   a.km_point := 76;
   a.odatetime := TO_TIMESTAMP('19-MAR-10 09.00.02.000000','DD-MON-YY HH24.MI.SS.FF');
   result := safety_distance(a);
+  DBMS_OUTPUT.PUT_LINE(result);
 end;
 */
 
