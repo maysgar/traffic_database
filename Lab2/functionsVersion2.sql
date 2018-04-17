@@ -145,13 +145,29 @@ BEGIN
 END;
 /
 
-insert into observations values('1405AOU',TO_TIMESTAMP('06-FEB-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',10,'ASC',160);
-insert into observations values('1405AOU',TO_TIMESTAMP('06-FEB-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',13,'ASC',160);
-insert into observations values('1405AOU',TO_TIMESTAMP('06-FEB-10 02.18.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',45,'ASC',160);
-
 /*
-PRUEBAS:
+TEST CASES:
 
+insert into observations values('1405AOU',TO_TIMESTAMP('06-JAN-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',10,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('06-JAN-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',13,'ASC',160);
+insert into observations values('1405AOU',TO_TIMESTAMP('06-JAN-10 02.18.00.790000','DD-MON-YY HH24.MI.SS.FF'),'A2',45,'ASC',160);
+
+--test with a 3 km section
+declare
+  a OBSERVATIONS%ROWTYPE;
+  result number;
+begin
+  a.nPlate := '1405AOU';
+  a.speed := 160;
+  a.road := 'A2';
+  a.direction := 'ASC';
+  a.km_point := 13;
+  a.odatetime := TO_TIMESTAMP('06-JAN-10 02.15.00.790000','DD-MON-YY HH24.MI.SS.FF');
+  result := exceeding_section_speed(a);
+end;
+/
+
+--test with 32 km
 declare
   a OBSERVATIONS%ROWTYPE;
   result number;
@@ -161,9 +177,10 @@ begin
   a.road := 'A2';
   a.direction := 'ASC';
   a.km_point := 45;
-  a.odatetime := TO_TIMESTAMP('06-FEB-10 02.14.00.790000','DD-MON-YY HH24.MI.SS.FF');
+  a.odatetime := TO_TIMESTAMP('06-JAN-10 02.18.00.790000','DD-MON-YY HH24.MI.SS.FF');
   result := exceeding_section_speed(a);
 end;
+/
 */
 
 
