@@ -61,10 +61,10 @@ WHERE A.dni IS NULL OR B.dni IS NULL
 /*
 SELECT owner FROM(
 SELECT owner FROM vehicles A
-FULL OUTER JOIN
+JOIN
 SELECT driver FROM assignments B
 ON A.nPlate = B.nPlate
-WHERE owner != reg_driver AND owner != driver
+WHERE A.owner != A.reg_driver AND A.owner != B.driver
 GROUP BY owner
 );
 */
