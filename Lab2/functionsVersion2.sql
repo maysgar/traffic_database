@@ -129,6 +129,8 @@ BEGIN
             ELSE 
               --If the section is delimited by 2 radars
               total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - radar_speed_limit)*10;
+
+              DBMS_OUTPUT.PUT_LINE('Radar speed limit: ' || radar_speed_limit);
               DBMS_OUTPUT.PUT_LINE('Time difference: ' || time_diff);
               DBMS_OUTPUT.PUT_LINE('Road speed limit: ' || road_speed_limit);
               DBMS_OUTPUT.PUT_LINE('Section kms: ' || (obs.km_point - obs2.km_point));
