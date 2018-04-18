@@ -137,6 +137,6 @@ delete from observations values('4444ACC');
 delete from vehicles values('1234XWE');
 delete from vehicles values('1234XWF');
 delete from vehicles values('4444ABC');
-delete from vehicles values('4444ACC');
+delete from vehicles values('4444ACC'); 
 
 */
