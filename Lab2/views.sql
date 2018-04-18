@@ -121,7 +121,7 @@ WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.dire
 
 /* d) Quick-Witted Drivers: the ten drivers whose average speed is closest to those
 of the road without exceeding it. Tip: base the calculation on the percentage of
-the maximum speed that each observation records. */
+the maximum speed that each observation records. */ 
 CREATE OR REPLACE VIEW quickWitted_drivers AS
 SELECT DNI
 FROM
