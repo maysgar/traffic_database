@@ -7,7 +7,7 @@ set serveroutput on;
 CREATE OR REPLACE FUNCTION exceeding_max_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
-  amount_fine INTEGER := 10;
+  amount_fine INTEGER := 10; 
   partial_amount INTEGER := 0;
   total_amount INTEGER := 0;
 
