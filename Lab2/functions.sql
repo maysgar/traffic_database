@@ -1,13 +1,22 @@
-set serveroutput on;
+CREATE OR REPLACE PACKAGE my_package IS
+FUNCTION exceeding_max_speed(obs OBSERVATIONS%ROWTYPE) RETURN NUMBER;
+FUNCTION exceeding_section_speed(obs OBSERVATIONS%ROWTYPE) RETURN NUMBER;
+FUNCTION safety_distance(obs OBSERVATIONS%ROWTYPE) RETURN NUMBER;
+FUNCTION obs_right_after_radar(obs OBSERVATIONS%ROWTYPE) RETURN OBSERVATIONS%ROWTYPE;
+FUNCTION obs_right_after_vehicle(obs OBSERVATIONS%ROWTYPE) RETURN OBSERVATIONS%ROWTYPE;
+END my_package;
+
+CREATE OR REPLACE PACKAGE BODY my_package IS
+
 /*
   All "amount sanctions" have been made with the thought that a vehicle(s) and a radar(s)
   are involved and have to be given as an input
 */
 
-CREATE OR REPLACE FUNCTION exceeding_max_speed (obs OBSERVATIONS%ROWTYPE)
+FUNCTION exceeding_max_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
-  amount_fine INTEGER := 10; 
+  amount_fine INTEGER := 10;
   partial_amount INTEGER := 0;
   total_amount INTEGER := 0;
 
@@ -33,7 +42,7 @@ BEGIN
     total_amount := CEIL(partial_amount*amount_fine);
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
-END;
+END exceeding_max_speed;
 
 /*
 PRUEBAS:
@@ -97,7 +106,7 @@ Results expected:
 - 0€ ok
 */
 
-CREATE OR REPLACE FUNCTION exceeding_section_speed (obs OBSERVATIONS%ROWTYPE)
+FUNCTION exceeding_section_speed (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
   obs2 OBSERVATIONS%ROWTYPE;
@@ -137,7 +146,7 @@ BEGIN
 
     DBMS_OUTPUT.PUT_LINE('Amount: ' || total_amount);
     RETURN total_amount;
-END;
+END exceeding_section_speed;
 /
 
 /*
@@ -180,7 +189,7 @@ end;
 
 
 -- Amount for a ‘safety distance’ radar sanction.
-CREATE OR REPLACE FUNCTION safety_distance (obs OBSERVATIONS%ROWTYPE)
+FUNCTION safety_distance (obs OBSERVATIONS%ROWTYPE)
 RETURN NUMBER
 IS
   obs2 OBSERVATIONS%ROWTYPE;
@@ -202,7 +211,7 @@ BEGIN
     total_amount := CEIL(partial_amount*amount_fine);
     DBMS_OUTPUT.PUT_LINE(total_amount);
     RETURN total_amount;
-END;
+END safety_distance;
 
 /*
 PRUEBAS:
@@ -240,7 +249,7 @@ end;
 */
 
 -- Observation immediately prior to a given observation (of the same radar)
-CREATE OR REPLACE FUNCTION obs_right_after_radar (obs OBSERVATIONS%ROWTYPE)
+FUNCTION obs_right_after_radar (obs OBSERVATIONS%ROWTYPE)
 RETURN OBSERVATIONS%ROWTYPE
 IS
   bool NUMBER := 0;
@@ -271,7 +280,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(obs2.odatetime);
     DBMS_OUTPUT.PUT_LINE(obs2.speed);
     RETURN obs2;
-END;
+END obs_right_after_radar;
 
 /*
 PRUEBAS:
@@ -294,7 +303,7 @@ Results expected:
 */
 
 -- Observation immediately prior to a given observation (of the same vehicle)
-CREATE OR REPLACE FUNCTION obs_right_after_vehicle (obs OBSERVATIONS%ROWTYPE)
+FUNCTION obs_right_after_vehicle (obs OBSERVATIONS%ROWTYPE)
 RETURN OBSERVATIONS%ROWTYPE
 IS
   obs2 OBSERVATIONS%ROWTYPE;
@@ -327,7 +336,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(obs2.direction);
     DBMS_OUTPUT.PUT_LINE(obs2.km_point);
     RETURN obs2;
-END;
+END obs_right_after_vehicle;
 
 /*
 PRUEBAS:
@@ -351,3 +360,4 @@ Results expected:
   -Prior observation (same vehicle): 29-DEC-11 08:53:30.40, A6, 118km/h, DES, 198
   ok
 */
+END my_package;
