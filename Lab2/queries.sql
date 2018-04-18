@@ -71,16 +71,18 @@ ORDER BY v_owned DESC;
 /*
 Prueba:
 
-05511330R ok 4
-56651407S ok 4
-22649968M ok 3
-60908146Y ok 3
-17017996C ok 3
-48906593Z ok 3
-49806223E ok 3
-19425545K ok 3
-82883718K ok 3
-48272209Q ok 3
+OWNER        V_OWNED
+--------- ----------
+48906593Z          7
+56651407S          4
+05511330R          4
+82883718K          3
+49806223E          3
+60908146Y          3
+22649968M          3
+19425545K          3
+17017996C          3
+48272209Q          3
 
 select owner, reg_driver, nPlate, count(nPlate)
 from vehicles
