@@ -1,7 +1,6 @@
 /*----------------------------QUERY A--------------------------*/
 /* The top 10 vehicles most 'observed' in the course of today. */
 
---NICEEEEEE (0)
 SELECT * FROM(
 SELECT nPlate, COUNT(nPlate) AS appearance
 FROM OBSERVATIONS
@@ -12,8 +11,6 @@ ORDER BY appearance DESC
 WHERE ROWNUM <= 10;
 
 /*
-Algo asi pa chequear que la query se hace
-
 SELECT * FROM(
 SELECT a.nPlate, COUNT(a.nPlate) AS appearance
 FROM OBSERVATIONS a, OBSERVATIONS b
@@ -28,8 +25,6 @@ WHERE ROWNUM <= 10;
 /* List of roads and their average speed limit, ordered from highest to lowest speed in the first instance and in alphabetical order of roads in second,
 counting both directions. */
 
---NICEEEEEE (10)
-
 SELECT name, speed_limit
 FROM(
 SELECT name, speed_limit
@@ -42,31 +37,36 @@ ORDER BY speed_limit DESC;
 /* People who do not drive any of their vehicles (neither as a regular driver nor
 as an additional driver). */
 
-SELECT owner FROM(
-(SELECT owner, nPlate, reg_driver FROM vehicles) A 
-JOIN 
+SELECT DISTINCT owner FROM vehicles WHERE owner != reg_driver
+UNION
+SELECT DISTINCT owner FROM(
+(SELECT owner, nPlate, reg_driver FROM vehicles) A
+JOIN
 (SELECT driver, nPlate FROM assignments) B
-ON A.nPlate = B.nPlate) 
-WHERE A.owner != A.reg_driver AND A.owner != B.driver 
+ON A.nPlate = B.nPlate)
+WHERE A.owner != A.reg_driver AND A.owner != B.driver
 GROUP BY owner;
-
-/* cosas de Gabo */
-/*
-SELECT name, surn_1 FROM(
-SELECT dni FROM drivers A
-FULL OUTER JOIN
-SELECT dni FROM persons B
-ON A.dni = B.dni
-WHERE A.dni IS NULL OR B.dni IS NULL
-);
-*/
 
 /*----------------------------QUERY D--------------------------*/
 /* Boss: owners of at least three cars they don’t drive. */
 
-
-
---NICEEEEEE (10)
+SELECT * FROM(
+SELECT owner, COUNT(nPlate) AS v_owned
+FROM VEHICLES
+WHERE reg_driver != owner
+GROUP BY owner
+HAVING COUNT(nPlate) >= 3
+UNION
+SELECT owner, COUNT(A.nPlate) AS v_owned
+FROM(
+SELECT owner, nPlate, reg_driver FROM vehicles) A
+JOIN
+(SELECT driver, nPlate FROM assignments) B
+ON A.nPlate = B.nPlate
+WHERE A.owner != A.reg_driver AND A.owner != B.driver
+GROUP BY A.owner
+HAVING COUNT(A.nPlate) >= 3)
+ORDER BY v_owned DESC;
 
 /*
 Prueba:
@@ -88,13 +88,6 @@ where owner = ' dni de los de arriba '
 group by owner, reg_driver, nPlate;
 
 */
-
-SELECT owner, COUNT(nPlate) AS v_owned
-FROM VEHICLES
-WHERE reg_driver != owner
-GROUP BY owner
-HAVING COUNT(nPlate) >= 3
-ORDER BY v_owned DESC;
 
 /*----------------------------QUERY E--------------------------*/
 /* Evolution: indicates the difference of income due to tickets fines between the

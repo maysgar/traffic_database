@@ -1,8 +1,41 @@
 --a) Insert tickets
-CURSOR fines IS
-  SELECT nPlate, owner, odatetime, speed, a.road, speedlim, a.Km_point, a.direction
-  FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
-  NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
+
+CREATE OR REPLACE TRIGGER insert_tickets
+BEFORE INSERT
+ON OBSERVATIONS
+DECLARE
+  obser OBSERVATIONS%ROWTYPE;
+  total_amount INTEGER := 0;
+  amount_speed INTEGER := 0;
+  amount_safety INTEGER := 0;
+  amount_section INTEGER := 0;
+  CURSOR obs IS
+    SELECT nPlate, owner, odatetime, a.road, a.km_point, a.direction, a.speed
+    FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
+    NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
+BEGIN
+    IF obs %ISOPEN THEN
+      CLOSE obs;
+    END IF;
+
+    FOR i IN obs
+    LOOP
+      obser.nPlate := i.nPlate;
+      obser.odatetime := i.odatetime;
+      obser.road := i.road;
+      obser.km_point := i.km_point;
+      obser.direction := i.direction;
+      obser.speed := i.speed;
+      amount_speed := exceeding_max_speed(a);
+      amount_section := exceeding_max_section_speed(a);
+      amount_safety := safety_distance(a);
+      total_amount := amount_speed + amount_section + amount_safety;
+
+      IF total_amount > 0 THEN
+        INSERT INTO TICKETS VALUES(a.nPlate,a.odatetime,'S',NULL,NULL,a.odatetime+1,NULL,'B',total_amount,i.owner,'R');
+      END IF;
+    END LOOP;
+END insert_tickets;
 
 
 /*
@@ -11,6 +44,9 @@ b) Process allegations: if the new debtor is not assigned to the vehicle,
  has already alleged the same ticket (in such cases, new state will be under
  study).
 */
+
+/*
+******************************* PSEUDOCODIGO **********************************
 
 CREATE OR REPLACE TRIGGER pr_alleg
 BEFORE UPDATE
@@ -41,6 +77,7 @@ BEGIN
     END IF;
   END IF;
 END pr_alleg;
+*/
 
 /*c) King_is_dead: when a regular driver dies (the attribute is nullified in
   the row of the vehicle) a new regular driver will be assigned from among

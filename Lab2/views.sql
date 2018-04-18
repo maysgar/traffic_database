@@ -9,7 +9,8 @@ CREATE OR REPLACE VIEW sanction_low_speed AS
     SELECT nPlate,speed,odatetime,speed_limit/2-speed AS difference FROM
     OBSERVATIONS JOIN ROADS ON road = name
     WHERE speed_limit/2 >= speed)
-  WHERE difference > 0;
+  WHERE difference > 0
+  WITH READ ONLY CONSTRAINT sanction_low_speed;
 
 /*
   Pruebas: --34 rows--
@@ -41,13 +42,15 @@ FROM(
   WHERE status = 'R' AND debtor = dni;
 )
 GROUP BY debtor, reg_date
-ORDER BY month DESC;
+ORDER BY month DESC
+WITH READ ONLY CONSTRAINT monthly_whinger;
 
 select debtor, extract(YEAR from reg_date), extract(MONTH from reg_date), COUNT(extract(MONTH from reg_date)) AS allegations
 from tickets natural join allegations
 where status='R'
 group by debtor, extract(YEAR from reg_date), extract(MONTH from reg_date)
-order by extract(YEAR from reg_date) DESC, extract(MONTH from reg_date) DESC;
+order by extract(YEAR from reg_date) DESC, extract(MONTH from reg_date) DESC
+WITH READ ONLY CONSTRAINT monthly_whinger;
 
 /*
 MIERDAS PARA INTENTAR CONSEGUIR SOLO EL MAX NUMBER OF DRIVERS FOR EACH MONTH
@@ -104,7 +107,8 @@ CREATE OR REPLACE VIEW Stretches AS
 SELECT DISTINCT R1.km_point AS start_point, CASE WHEN ABS(R1.km_point-R2.km_point) > 5 THEN R1.km_point+5
         ELSE R2.km_point END AS end_point, R1.road, R1.speedlim
   FROM RADARS R1, RADARS R2 JOIN ROADS ON name = road
-  WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit ;
+  WHERE R1.km_point < R2.km_point AND R1.road = R2.road AND R1.direction = R2.direction AND R1.km_point != R2.km_point AND R1.speedlim < speed_limit
+  WITH READ ONLY CONSTRAINT Stretches;
 
 /*
 TESTS: we do a query where we also select the speed limit of the road in order to see the difference and make sure the result is correct

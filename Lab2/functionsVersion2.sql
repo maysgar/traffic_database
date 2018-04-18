@@ -115,28 +115,23 @@ BEGIN
         --In the same day, month, year and hour...
         IF TO_CHAR(obs.odatetime,'DD-MON-YY HH24') = TO_CHAR(obs2.odatetime,'DD-MON-YY HH24') THEN
         --If the two observations correspond to the same car
-            time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime)))*60;
-            IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
-              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
-            END IF;
-            IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
-              time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
-            END IF;
- 
-              --If the section is delimited by 2 radars
-              total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - radar_speed_limit)*10;
-              DBMS_OUTPUT.PUT_LINE('Velocity: ' || (((obs.km_point - obs2.km_point)*3600)/time_diff));
-              DBMS_OUTPUT.PUT_LINE('Amount: ' || total_amount);
-              
-              --If the section is not delimited by 2 radars
-            IF (obs.km_point - obs2.km_point) > 5 THEN
-              total_amount := total_amount + (((((obs.km_point - obs2.km_point)*3600)/time_diff) - road_speed_limit)*10);
-            END IF;
+          time_diff := (TO_NUMBER(EXTRACT(MINUTE FROM obs.odatetime))-TO_NUMBER(EXTRACT(MINUTE FROM obs2.odatetime)))*60;
+          IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) >= TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
+            time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime));
+          END IF;
+          IF TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) < TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)) THEN
+            time_diff := time_diff + TO_NUMBER(EXTRACT(SECOND FROM obs.odatetime)) + (60 - TO_NUMBER(EXTRACT(SECOND FROM obs2.odatetime)));
+          END IF;
 
-              DBMS_OUTPUT.PUT_LINE('Radar speed limit: ' || radar_speed_limit);
-              DBMS_OUTPUT.PUT_LINE('Time difference: ' || time_diff);
-              DBMS_OUTPUT.PUT_LINE('Road speed limit: ' || road_speed_limit);
-              DBMS_OUTPUT.PUT_LINE('Section kms: ' || (obs.km_point - obs2.km_point));
+            --If the section is delimited by 2 radars
+            total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - radar_speed_limit)*10;
+            DBMS_OUTPUT.PUT_LINE('Velocity: ' || (((obs.km_point - obs2.km_point)*3600)/time_diff));
+            DBMS_OUTPUT.PUT_LINE('Amount: ' || total_amount);
+
+            --If the section is not delimited by 2 radars
+          IF (obs.km_point - obs2.km_point) > 5 THEN
+            total_amount := total_amount + (((((obs.km_point - obs2.km_point)*3600)/time_diff) - road_speed_limit)*10);
+          END IF;
         END IF;
       END IF;
 
