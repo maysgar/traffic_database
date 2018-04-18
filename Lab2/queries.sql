@@ -4,7 +4,9 @@
 SELECT * FROM(
 SELECT nPlate, COUNT(nPlate) AS appearance
 FROM OBSERVATIONS
-WHERE odatetime = sysdate
+WHERE EXTRACT(YEAR FROM odatetime) = EXTRACT(YEAR FROM sysdate)
+AND EXTRACT(MONTH FROM odatetime) = EXTRACT(YEAR FROM sysdate)
+AND EXTRACT(DAY FROM odatetime) = EXTRACT(YEAR FROM sysdate)
 GROUP BY nPlate
 ORDER BY appearance DESC
 )
