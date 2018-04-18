@@ -1,42 +1,52 @@
 --a) Insert tickets
 
 CREATE OR REPLACE TRIGGER insert_tickets
-BEFORE INSERT
+AFTER INSERT
 ON OBSERVATIONS
+FOR EACH ROW
 DECLARE
   obser OBSERVATIONS%ROWTYPE;
-  total_amount INTEGER := 0;
   amount_speed INTEGER := 0;
   amount_safety INTEGER := 0;
   amount_section INTEGER := 0;
-  CURSOR obs IS
-    SELECT nPlate, owner, odatetime, a.road, a.km_point, a.direction, a.speed
-    FROM RADARS a JOIN OBSERVATIONS b ON a.road = b.road AND a.Km_point = b.Km_point AND a.direction = b.direction
-    NATURAL JOIN VEHICLES JOIN PERSONS ON owner = dni;
-BEGIN
-    IF obs %ISOPEN THEN
-      CLOSE obs;
-    END IF;
-
-    FOR i IN obs
-    LOOP
-      obser.nPlate := i.nPlate;
-      obser.odatetime := i.odatetime;
-      obser.road := i.road;
-      obser.km_point := i.km_point;
-      obser.direction := i.direction;
-      obser.speed := i.speed;
-      amount_speed := exceeding_max_speed(a);
-      amount_section := exceeding_max_section_speed(a);
-      amount_safety := safety_distance(a);
-      total_amount := amount_speed + amount_section + amount_safety;
-
-      IF total_amount > 0 THEN
-        INSERT INTO TICKETS VALUES(a.nPlate,a.odatetime,'S',NULL,NULL,a.odatetime+1,NULL,'B',total_amount,i.owner,'R');
-      END IF;
-    END LOOP;
+  obs_before_r OBSERVATIONS%ROWTYPE;
+  obs_before_v OBSERVATIONS%ROWTYPE;
+  debtor VARCHAR2(9);
+  CURSOR deb IS
+	SELECT owner FROM VEHICLES WHERE nPlate = :new.nPlate;
+BEGIN  	  
+	  FOR i IN deb
+	  LOOP
+		  obser.nPlate := :new.nPlate;
+		  obser.odatetime := :new.odatetime;
+		  obser.road := :new.road;
+		  obser.km_point := :new.km_point;
+		  obser.direction := :new.direction;
+		  obser.speed := :new.speed;
+		  
+		  amount_speed := exceeding_max_speed(obser);
+		  amount_section := exceeding_section_speed(obser);
+		  amount_safety := safety_distance(obser); 
+	 
+		  IF amount_speed > 0 THEN
+			INSERT INTO TICKETS VALUES(obser.nPlate,obser.odatetime,'S',NULL,NULL,obser.odatetime+1,NULL,NULL,amount_speed,i.owner,'N');
+		  ELSE 
+			RAISE_APPLICATION_ERROR(-20001, 'Ticket cannot be inserted, no fine exists');
+		  END IF;
+		  IF amount_section > 0 THEN
+			obs_before_v := obs_right_after_radar(obser); 
+			INSERT INTO TICKETS VALUES(obser.nPlate,obser.odatetime,'T',obs_before_v.nPlate,obs_before_v.odatetime,obser.odatetime+1,NULL,NULL,amount_section,i.owner,'N');
+		  ELSE 
+			RAISE_APPLICATION_ERROR(-20001, 'Ticket cannot be inserted, no fine exists');
+		  END IF;
+		  IF amount_safety > 0 THEN
+			obs_before_r := obs_right_after_vehicle(obser);
+			INSERT INTO TICKETS VALUES(obser.nPlate,obser.odatetime,'D',obs_before_r.nPlate,obs_before_r.odatetime,obser.odatetime+1,NULL,NULL,amount_safety,i.owner,'N');
+		  ELSE 
+			RAISE_APPLICATION_ERROR(-20001, 'Ticket cannot be inserted, no fine exists');
+		  END IF;
+	  END LOOP;
 END insert_tickets;
-
 
 /*
 b) Process allegations: if the new debtor is not assigned to the vehicle,
