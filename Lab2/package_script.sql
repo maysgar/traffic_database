@@ -134,8 +134,6 @@ BEGIN
 
             --If the section is delimited by 2 radars
             total_amount := ((((obs.km_point - obs2.km_point)*3600)/time_diff) - radar_speed_limit)*10;
-            DBMS_OUTPUT.PUT_LINE('Velocity: ' || (((obs.km_point - obs2.km_point)*3600)/time_diff));
-            DBMS_OUTPUT.PUT_LINE('Amount: ' || total_amount);
 
             --If the section is not delimited by 2 radars
           IF (obs.km_point - obs2.km_point) > 5 THEN

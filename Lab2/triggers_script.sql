@@ -14,7 +14,7 @@ DECLARE
   debtor VARCHAR2(9);
   CURSOR deb IS
 	SELECT owner FROM VEHICLES WHERE nPlate = :new.nPlate;
-BEGIN  	  
+BEGIN
 	  FOR i IN deb
 	  LOOP
 		  obser.nPlate := :new.nPlate;
@@ -23,26 +23,26 @@ BEGIN
 		  obser.km_point := :new.km_point;
 		  obser.direction := :new.direction;
 		  obser.speed := :new.speed;
-		  
+
 		  amount_speed := exceeding_max_speed(obser);
 		  amount_section := exceeding_section_speed(obser);
-		  amount_safety := safety_distance(obser); 
-	 
+		  amount_safety := safety_distance(obser);
+
 		  IF amount_speed > 0 THEN
 			INSERT INTO TICKETS VALUES(obser.nPlate,obser.odatetime,'S',NULL,NULL,obser.odatetime+1,NULL,NULL,amount_speed,i.owner,'N');
-		  ELSE 
+		  ELSE
 			RAISE_APPLICATION_ERROR(-20001, 'Ticket cannot be inserted, no fine exists');
 		  END IF;
 		  IF amount_section > 0 THEN
-			obs_before_v := obs_right_after_radar(obser); 
+			obs_before_v := obs_right_after_radar(obser);
 			INSERT INTO TICKETS VALUES(obser.nPlate,obser.odatetime,'T',obs_before_v.nPlate,obs_before_v.odatetime,obser.odatetime+1,NULL,NULL,amount_section,i.owner,'N');
-		  ELSE 
+		  ELSE
 			RAISE_APPLICATION_ERROR(-20001, 'Ticket cannot be inserted, no fine exists');
 		  END IF;
 		  IF amount_safety > 0 THEN
 			obs_before_r := obs_right_after_vehicle(obser);
 			INSERT INTO TICKETS VALUES(obser.nPlate,obser.odatetime,'D',obs_before_r.nPlate,obs_before_r.odatetime,obser.odatetime+1,NULL,NULL,amount_safety,i.owner,'N');
-		  ELSE 
+		  ELSE
 			RAISE_APPLICATION_ERROR(-20001, 'Ticket cannot be inserted, no fine exists');
 		  END IF;
 	  END LOOP;
