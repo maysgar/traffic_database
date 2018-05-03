@@ -3,7 +3,7 @@
 -- INDEXES
 CREATE UNIQUE INDEX index_odatetime ON observations(odatetime);
 CREATE UNIQUE INDEX index_radar ON radars(radars, km_point, direction);
-CREATE INDEX index_speedlim ON roads(speedlim);
+CREATE INDEX index_speedlim ON roads(speed_limit);
 CREATE INDEX index_speed ON observations(speed);
 
 -- CLUSTERS
